@@ -1,0 +1,35 @@
+Problem Statement: 
+Admi is a B2B SaaS company that helps German municipalities plan and deploy rooftop solar PV systems. Before every sales call, a sales engineer spends 2–4 hours manually pulling together a briefing: how many buildings are in the target municipality, what the aggregate solar potential looks like (roof area, estimated yield, system sizing), whether the municipality is already in the CRM, and any relevant deal history.
+Your task is to design a system that automates this briefing. A sales engineer should be able to type or say a municipality name — for example "Gemeinde Kirchheim" — and receive a structured briefing within a few minutes, ready for a call.
+An example of output is:
+Municipality: Gemeinde Kirchheim · AGS 09175124 · Bayern 
+Solar potential 
+847 buildings assessed · 312 suitable for solar (37%)
+Aggregate system size: ~4.2 MWp · Estimated yield: ~3,800 MWh/year 
+Average irradiance: 1,050 kWh/m²/year · Est. CO₂ savings: 1,900 t/year 
+Top opportunity 
+Rathaus, Hauptstraße 12 — 280 m² south-facing roof, ~42 kWp, ~7.2-year payback 
+CRM status 
+2 active deals (Potential Analysis stage) · Last contact: 3 weeks ago 
+Key contact: Hans Müller, Bürgermeister 
+Recommendation 
+High-priority lead. Strong irradiance, existing relationship via 2022 energy audit. Recommend opening with Rathaus as anchor project.
+Assume you have access to:
+A PostGIS database (3dcityDB) with buildings ingested from official CityGML sources
+The Google Solar API — given building coordinates, returns roof segmentation and irradiance data (kWh/m²/year) for any location in Germany
+A HubSpot CRM instance with full deal and contact history
+A React js frontend used by the sales team
+The PV calculation should be resolved by AI, the response should looks like:
+{ "building_id": "DE_NW_05374_123456", "address": "Rathaus, Hauptstraße 12, 73230 Kirchheim", "roof_segments": [ { "id": "seg_01", "orientation": "South", "tilt_deg": 28, "usable_area_m2": 180, "irradiance_kwh_m2_year": 1080 }, { "id": "seg_02", "orientation": "West", "tilt_deg": 28, "usable_area_m2": 100, "irradiance_kwh_m2_year": 890 } ], "pv_assessment": { "recommended_system_size_kwp": 42, "estimated_annual_yield_kwh": 38500, "estimated_capex_eur": 63000, "estimated_annual_savings_eur": 9200, "payback_period_years": 6.8, "co2_savings_tons_per_year": 19.3, "confidence": "high", "assumptions": [ "Panel efficiency: 21%", "System losses: 14%", "Electricity price: 0.32 EUR/kWh", "Feed-in tariff: 0.082 EUR/kWh" ] }, "narrative": "The Rathaus building has strong solar potential. The south-facing primary segment (180 m²) receives above-average irradiance for Bavaria. A 42 kWp system would cover approximately 65% of the building's estimated annual consumption and deliver a payback period well within municipal funding thresholds." }
+You have one hour. Start with any clarifying questions, then walk us through your design.
+What to Submit
+A written design document. Spend no more than 3 hours. We value clear thinking over completeness.
+Your document should cover these four sections:
+1. Clarifying Assumptions List the assumptions you made that most affect your design. What would you have asked us if this were a live conversation? For each assumption, state what you assumed and why.
+2. System Design Describe the architecture: what components exist, what each does, how they communicate, and where state lives. A diagram is welcome but not required. Address at minimum:
+How a municipality is identified and looked up.
+How and when PV calculations are triggered — not all 50,000 buildings in a municipality can be computed on the fly
+How CRM data is joined to building/geospatial data
+Suggest a UX for this feature
+3. AI in This System Where does AI make this system meaningfully better — and where does it not? Why a simpler non-AI solution would fall short. Also describe one risk specific to using AI here and how you'd mitigate it.
+4. Tradeoffs & What You'd Cut If you had to ship a working v1 in two weeks, what would you cut and why? What does that version look like? 
