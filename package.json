@@ -1,0 +1,13 @@
+{
+  "name": "dmi-presentation",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Sales Briefing Agent - Interactive Presentation",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
