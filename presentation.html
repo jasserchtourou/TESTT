@@ -57,7 +57,7 @@ svg{max-width:100%;height:auto}
 <!-- SLIDE 1: TITLE -->
 <div class="slide active" id="slide-1">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">01 / 15</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">01 / 14</span></div>
   <div class="title-slide-body">
     <div class="main-title">Sales Briefing System</div>
     <div class="main-sub">Type "Gemeinde Kirchheim" → Get a structured briefing in minutes</div>
@@ -74,7 +74,7 @@ svg{max-width:100%;height:auto}
 <!-- SLIDE 2: ASSUMPTIONS (Part 1) -->
 <div class="slide" id="slide-2">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">02 / 15</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">02 / 14</span></div>
   <div class="slide-body">
     <div class="slide-title">Clarifying Assumptions</div>
     <div class="slide-subtitle">Critical questions that shaped the architecture</div>
@@ -99,7 +99,7 @@ svg{max-width:100%;height:auto}
 <!-- SLIDE 3: ASSUMPTIONS (Part 2) -->
 <div class="slide" id="slide-3">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">03 / 15</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">03 / 14</span></div>
   <div class="slide-body">
     <div class="slide-title">More Clarifying Assumptions</div>
     <div class="slide-subtitle">Additional constraints that shaped design decisions</div>
@@ -124,7 +124,7 @@ svg{max-width:100%;height:auto}
 <!-- SLIDE 4: PRODUCTION ARCHITECTURE -->
 <div class="slide" id="slide-4">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">04 / 15</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">04 / 14</span></div>
   <div class="slide-body">
     <div class="slide-title">System Architecture</div>
     <div class="slide-subtitle">Complete stack: from user input to briefing output</div>
@@ -218,7 +218,7 @@ svg{max-width:100%;height:auto}
 <!-- SLIDE 5: COMPONENT DIAGRAM -->
 <div class="slide" id="slide-5">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">05 / 15</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">05 / 14</span></div>
   <div class="slide-body">
     <div class="slide-title">Component Diagram</div>
     <div class="slide-subtitle">System components and their relationships</div>
@@ -302,7 +302,7 @@ svg{max-width:100%;height:auto}
 <!-- SLIDE 6: SEQUENCE DIAGRAM -->
 <div class="slide" id="slide-6">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">06 / 15</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">06 / 14</span></div>
   <div class="slide-body">
     <div class="slide-title">Sequence Diagram</div>
     <div class="slide-subtitle">7-step workflow when user searches "Kirchheim"</div>
@@ -407,53 +407,10 @@ svg{max-width:100%;height:auto}
   </div>
 </div>
 
-<!-- SLIDE 7: SEQUENCE DIAGRAM -->
+<!-- SLIDE 7: DESIGN DECISION #1 -->
 <div class="slide" id="slide-7">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">07 / 15</span></div>
-  <div class="slide-body">
-    <div class="slide-title">Sequence Diagram</div>
-    <div class="slide-subtitle">7-step workflow: "Kirchheim" → Briefing (2-3 min)</div>
-    <div style="flex:1;overflow:auto">
-      <div class="timeline-item">
-        <div class="time">1️⃣ User Input → Geocoding (500ms)</div>
-        <div class="desc">"Kirchheim" + fuzzy match → AGS code + bbox (cached)</div>
-      </div>
-      <div class="timeline-item">
-        <div class="time">2️⃣ Pre-Filter (800ms)</div>
-        <div class="desc">Query 3dcityDB: 50k buildings → filter roof > 200m² → sort by area</div>
-      </div>
-      <div class="timeline-item">
-        <div class="time">3️⃣ Solar Calculation (1-2 min) ⭐ Slowest</div>
-        <div class="desc">Call Google Solar API for top 50 buildings only. Returns: kWh/year, irradiance</div>
-      </div>
-      <div class="timeline-item">
-        <div class="time">4️⃣ PV Math (100ms)</div>
-        <div class="desc">Deterministic: kWp = area × insolation × efficiency. Payback = capex ÷ savings</div>
-      </div>
-      <div class="timeline-item">
-        <div class="time">5️⃣ CRM Join (200ms)</div>
-        <div class="desc">Fuzzy address match buildings to HubSpot deals. Attach deal status + contacts</div>
-      </div>
-      <div class="timeline-item">
-        <div class="time">6️⃣ LLM Narrative (2-3s)</div>
-        <div class="desc">Generate summary. AI writes TEXT ONLY. All numbers injected from PV math.</div>
-      </div>
-      <div class="timeline-item">
-        <div class="time">7️⃣ Return Briefing JSON (immediate)</div>
-        <div class="desc">Structured output: municipality, solar results, CRM context, recommendation</div>
-      </div>
-      <div class="highlight-box" style="margin-top:16px">
-        <p><strong>Total: 2-3 minutes | Cost: €1.50</strong> (50 API calls × €0.03)</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- SLIDE 8: DESIGN DECISION #1 -->
-<div class="slide" id="slide-8">
-  <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">08 / 15</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">07 / 14</span></div>
   <div class="slide-body">
     <div class="slide-title">Design Decision #1: Municipality Lookup</div>
     <div class="slide-subtitle">How does "Kirchheim" become a searchable geographic area?</div>
@@ -472,9 +429,9 @@ svg{max-width:100%;height:auto}
 </div>
 
 <!-- SLIDE 10: DESIGN DECISION #2 -->
-<div class="slide" id="slide-9">
+<div class="slide" id="slide-8">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">09 / 15</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">08 / 14</span></div>
   <div class="slide-body">
     <div class="slide-title">Design Decision #2: PV Computation Strategy</div>
     <div class="slide-subtitle">How do we avoid calling Google Solar API 50,000 times?</div>
@@ -493,9 +450,9 @@ svg{max-width:100%;height:auto}
 </div>
 
 <!-- SLIDE 11: DESIGN DECISION #3 -->
-<div class="slide" id="slide-10">
+<div class="slide" id="slide-9">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">10 / 15</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">09 / 14</span></div>
   <div class="slide-body">
     <div class="slide-title">Design Decision #3: Where AI Fits</div>
     <div class="slide-subtitle">When AI creates value, and when it creates risk</div>
@@ -518,9 +475,9 @@ svg{max-width:100%;height:auto}
 </div>
 
 <!-- SLIDE 12: DESIGN DECISION #4 -->
-<div class="slide" id="slide-11">
+<div class="slide" id="slide-10">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">11 / 15</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">10 / 14</span></div>
   <div class="slide-body">
     <div class="slide-title">Design Decision #4: CRM Data Join</div>
     <div class="slide-subtitle">Linking buildings to deals without a common key</div>
@@ -539,9 +496,9 @@ svg{max-width:100%;height:auto}
 </div>
 
 <!-- SLIDE 13: TRADE-OFFS -->
-<div class="slide" id="slide-12">
+<div class="slide" id="slide-11">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">12 / 15</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">11 / 14</span></div>
   <div class="slide-body">
     <div class="slide-title">V1 Trade-offs: What Ships in 2 Weeks</div>
     <div class="slide-subtitle">Shipping means cutting features that don't prove the core idea</div>
@@ -565,9 +522,9 @@ svg{max-width:100%;height:auto}
 </div>
 
 <!-- SLIDE 14: SUMMARY -->
-<div class="slide" id="slide-13">
+<div class="slide" id="slide-12">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">14 / 15</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">13 / 14</span></div>
   <div class="slide-body" style="align-items:center;justify-content:center;text-align:center">
     <div class="slide-title" style="margin-bottom:16px">The Core Architectural Insight</div>
     <div class="slide-subtitle" style="margin-bottom:32px">Everything flows from one principle</div>
@@ -588,9 +545,9 @@ svg{max-width:100%;height:auto}
 </div>
 
 <!-- SLIDE 15: SECURITY & RISK -->
-<div class="slide" id="slide-14">
+<div class="slide" id="slide-13">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">14 / 15</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">13 / 14</span></div>
   <div class="slide-body">
     <div class="slide-title">Security & Risk Mitigation</div>
     <div class="slide-subtitle">Production-grade safeguards and compliance</div>
@@ -613,9 +570,9 @@ svg{max-width:100%;height:auto}
 </div>
 
 <!-- SLIDE 15: LIVE DEMO -->
-<div class="slide" id="slide-14">
+<div class="slide" id="slide-13">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">15 / 15</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">14 / 14</span></div>
   <div class="slide-body" style="align-items:center;justify-content:center;text-align:center">
     <div class="slide-title" style="margin-bottom:16px">Live Demonstration</div>
     <div class="slide-subtitle">Interactive prototype of the user interface</div>
@@ -633,7 +590,7 @@ svg{max-width:100%;height:auto}
 </div>
 
 <script>
-const totalSlides=15;let current=1;
+const totalSlides=14;let current=1;
 const dotsEl=document.getElementById('dots');
 for(let i=1;i<=totalSlides;i++){const d=document.createElement('div');d.className='dot'+(i===1?' active':'');d.onclick=()=>goTo(i);dotsEl.appendChild(d)}
 function goTo(n){document.getElementById('slide-'+current).classList.remove('active');dotsEl.children[current-1].classList.remove('active');current=Math.max(1,Math.min(totalSlides,n));document.getElementById('slide-'+current).classList.add('active');dotsEl.children[current-1].classList.add('active')}
