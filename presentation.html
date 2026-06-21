@@ -18,6 +18,7 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
 .slide-body{flex:1;display:flex;flex-direction:column;padding:36px 60px 28px;overflow:auto}
 .slide-title{font-size:36px;font-weight:800;line-height:1.15;background:linear-gradient(135deg,var(--white) 40%,var(--blue2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
 .slide-subtitle{font-size:15px;color:var(--gray);font-weight:400;margin-bottom:24px}
+.mermaid{display:flex;justify-content:center;align-items:center;font-size:12px !important}
 .nav{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:12px;z-index:100;align-items:center}
 .nav button{background:rgba(30,144,255,0.15);border:1px solid var(--blue);color:var(--white);padding:10px 24px;border-radius:30px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
 .nav button:hover{background:var(--blue)}
@@ -67,13 +68,15 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
 </style>
 </head>
 <body>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true,theme:'dark',securityLevel:'loose',diagram:{useMaxWidth:true},flowchart:{curve:'linear'}});</script>
 <div class="key-hint">Arrow keys to navigate</div>
 <div class="deck" id="deck">
 
 <!-- SLIDE 1 — Title -->
 <div class="slide active" id="slide-1">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">01 / 12</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">01 / 17</span></div>
   <div class="title-slide-body">
     <div class="main-title">Sales Briefing System</div>
     <div class="main-sub">Type "Gemeinde Kirchheim" → Get a structured briefing in minutes</div>
@@ -90,7 +93,7 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
 <!-- SLIDE 2 — Assumptions (Part 1) -->
 <div class="slide" id="slide-2">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">02 / 12</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">02 / 17</span></div>
   <div class="slide-body">
     <div class="slide-title">Clarifying Assumptions</div>
     <div class="slide-subtitle">Critical questions that shaped the architecture</div>
@@ -118,7 +121,7 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
 <!-- SLIDE 3 — Assumptions (Part 2) -->
 <div class="slide" id="slide-3">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">03 / 12</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">03 / 17</span></div>
   <div class="slide-body">
     <div class="slide-title">More Clarifying Assumptions</div>
     <div class="slide-subtitle">Additional constraints that shaped design decisions</div>
@@ -146,7 +149,7 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
 <!-- SLIDE 4 — System Architecture -->
 <div class="slide" id="slide-4">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">04 / 12</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">04 / 17</span></div>
   <div class="slide-body">
     <div class="slide-title">System Architecture</div>
     <div class="slide-subtitle">Complete stack: from user input to briefing output</div>
@@ -227,10 +230,126 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
   </div>
 </div>
 
-<!-- SLIDE 5 — Data Flow / Workflow -->
+<!-- SLIDE 5 — Component Diagram -->
 <div class="slide" id="slide-5">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">05 / 12</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">05 / 17</span></div>
+  <div class="slide-body">
+    <div class="slide-title">Component Diagram (UML)</div>
+    <div class="slide-subtitle">System components and their relationships</div>
+    <div class="mermaid">
+      graph LR
+        User["👤 Sales Engineer"]
+        React["⚛️ React Frontend"]
+        API["🔧 API Server"]
+        Geocoder["🗺️ Geocoder"]
+        PreFilter["🔍 Pre-Filter"]
+        Solar["☀️ Solar API"]
+        PV["⚙️ PV Math"]
+        LLM["🤖 LLM"]
+        DB["🗄️ PostGIS DB"]
+        Redis["💾 Redis Cache"]
+        CRM["📊 HubSpot CRM"]
+        Output["📋 Briefing JSON"]
+
+        User --> React
+        React --> API
+        API --> Geocoder
+        API --> PreFilter
+        API --> Solar
+        API --> PV
+        API --> LLM
+        Geocoder --> Redis
+        PreFilter --> DB
+        Solar --> Redis
+        PV --> Output
+        LLM --> Output
+        API --> CRM
+        API --> Output
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6 — Deployment Diagram -->
+<div class="slide" id="slide-15">
+  <div class="grid-bg"></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">06 / 17</span></div>
+  <div class="slide-body">
+    <div class="slide-title">Deployment Diagram (UML)</div>
+    <div class="slide-subtitle">Production AWS infrastructure and data flow</div>
+    <div class="mermaid">
+      graph TB
+        subgraph Users["🌐 Users"]
+          Client["Browser"]
+        end
+        subgraph CDN["📡 Edge"]
+          CloudFront["CloudFront CDN"]
+        end
+        subgraph AWS["☁️ AWS"]
+          ALB["AWS ALB"]
+          ECS1["ECS Fargate"]
+          ECS2["ECS Fargate"]
+          ECS3["ECS Fargate"]
+          RDS["RDS PostgreSQL"]
+          PostGIS["PostGIS 3dcityDB"]
+          Redis["ElastiCache Redis"]
+          S3["S3 Bucket"]
+        end
+        subgraph External["🔗 External APIs"]
+          GSolar["Google Solar API"]
+          HubSpot["HubSpot CRM"]
+        end
+
+        Client --> CloudFront
+        CloudFront --> ALB
+        ALB --> ECS1
+        ALB --> ECS2
+        ALB --> ECS3
+        ECS1 --> RDS
+        ECS1 --> PostGIS
+        ECS1 --> Redis
+        ECS1 --> S3
+        ECS1 --> GSolar
+        ECS1 --> HubSpot
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7 — Sequence Diagram -->
+<div class="slide" id="slide-13">
+  <div class="grid-bg"></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">07 / 17</span></div>
+  <div class="slide-body">
+    <div class="slide-title">Sequence Diagram (UML)</div>
+    <div class="slide-subtitle">7-step workflow when user searches "Kirchheim"</div>
+    <div class="mermaid">
+      sequenceDiagram
+        participant U as User
+        participant A as API
+        participant G as Geocoder
+        participant D as 3dcityDB
+        participant S as Solar API
+        participant L as LLM
+
+        U->>A: Search "Kirchheim"
+        A->>G: Fuzzy match
+        G-->>A: Bounds + AGS code (500ms)
+        A->>D: Pre-filter buildings
+        D-->>A: Top 5k buildings (800ms)
+        A->>S: Call for top 50
+        S-->>A: Solar results (1-2 min)
+        A->>A: PV Math (100ms)
+        A->>L: Generate narrative
+        L-->>A: Summary text (2-3s)
+        A-->>U: Briefing JSON (2-3 min total)
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 8 — Data Flow / Workflow -->
+<div class="slide" id="slide-14">
+  <div class="grid-bg"></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">08 / 17</span></div>
   <div class="slide-body">
     <div class="slide-title">Request Workflow</div>
     <div class="slide-subtitle">Step-by-step execution when user searches "Gemeinde Kirchheim"</div>
@@ -277,9 +396,9 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
 </div>
 
 <!-- SLIDE 6 — Design Decision #1 - Municipality Lookup -->
-<div class="slide" id="slide-6">
+<div class="slide" id="slide-15">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">06 / 12</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">09 / 17</span></div>
   <div class="slide-body">
     <div class="slide-title">Design Decision #1: Municipality Lookup</div>
     <div class="slide-subtitle">How does "Kirchheim" become a searchable geographic area?</div>
@@ -301,9 +420,9 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
 </div>
 
 <!-- SLIDE 7 — Design Decision #2 - PV Triggers -->
-<div class="slide" id="slide-7">
+<div class="slide" id="slide-13">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">07 / 12</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">10 / 17</span></div>
   <div class="slide-body">
     <div class="slide-title">Design Decision #2: PV Computation Strategy</div>
     <div class="slide-subtitle">How do we avoid calling Google Solar API 50,000 times?</div>
@@ -325,9 +444,9 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
 </div>
 
 <!-- SLIDE 8 — Design Decision #3 - AI Role -->
-<div class="slide" id="slide-8">
+<div class="slide" id="slide-14">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">08 / 12</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">11 / 17</span></div>
   <div class="slide-body">
     <div class="slide-title">Design Decision #3: Where AI Fits</div>
     <div class="slide-subtitle">When AI creates value, and when it creates risk</div>
@@ -354,9 +473,9 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
 </div>
 
 <!-- SLIDE 9 — Design Decision #4 - CRM Join -->
-<div class="slide" id="slide-9">
+<div class="slide" id="slide-15">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">09 / 12</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">12 / 17</span></div>
   <div class="slide-body">
     <div class="slide-title">Design Decision #4: CRM Data Join</div>
     <div class="slide-subtitle">Linking buildings to deals without a common key</div>
@@ -378,9 +497,9 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
 </div>
 
 <!-- SLIDE 10 — Trade-offs: What to Cut -->
-<div class="slide" id="slide-10">
+<div class="slide" id="slide-13">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">10 / 12</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">13 / 17</span></div>
   <div class="slide-body">
     <div class="slide-title">V1 Trade-offs: What Ships in 2 Weeks</div>
     <div class="slide-subtitle">Shipping means cutting features that don't prove the core idea</div>
@@ -407,10 +526,39 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
   </div>
 </div>
 
-<!-- SLIDE 11 — Summary -->
-<div class="slide" id="slide-11">
+<!-- SLIDE 15 — Security & Risk -->
+<div class="slide" id="slide-15">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">11 / 12</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">15 / 17</span></div>
+  <div class="slide-body">
+    <div class="slide-title">Security & Risk Mitigation</div>
+    <div class="slide-subtitle">Production-grade safeguards and compliance</div>
+
+    <div class="decision-card">
+      <div class="dec-title">🔐 Authentication & Encryption</div>
+      <div class="dec-text">OAuth2 for HubSpot login. TLS 1.3 encryption in transit. AWS KMS encryption at rest. Rate limiting: 1,000 req/min per user.</div>
+    </div>
+
+    <div class="decision-card">
+      <div class="dec-title">🛡️ AI Safety</div>
+      <div class="dec-text">Pydantic schemas validate every output. AI writes text only. All financial numbers from deterministic code. Circuit breaker for API failures.</div>
+    </div>
+
+    <div class="decision-card">
+      <div class="dec-title">📋 Compliance</div>
+      <div class="dec-text">GDPR: 24-month data retention. Audit logs record every API call. SOC2 ready with CloudWatch + Datadog monitoring.</div>
+    </div>
+
+    <div class="highlight-box">
+      <p><strong>Risk Principle:</strong> Never let AI generate financial numbers. Validation happens at every layer. Auditability is built-in.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 16 — Summary -->
+<div class="slide" id="slide-16">
+  <div class="grid-bg"></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">16 / 17</span></div>
   <div class="slide-body" style="align-items:center;justify-content:center;text-align:center">
     <div class="slide-title" style="margin-bottom:16px">The Core Architectural Insight</div>
     <div class="slide-subtitle" style="margin-bottom:32px">Everything flows from one principle</div>
@@ -432,10 +580,10 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
   </div>
 </div>
 
-<!-- SLIDE 12 — Live Demo -->
-<div class="slide" id="slide-12">
+<!-- SLIDE 17 — Live Demo -->
+<div class="slide" id="slide-17">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">12 / 12</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">17 / 17</span></div>
   <div class="slide-body" style="align-items:center;justify-content:center;text-align:center">
     <div class="slide-title" style="margin-bottom:16px">Live Demonstration</div>
     <div class="slide-subtitle">Interactive prototype of the user interface</div>
@@ -453,7 +601,7 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
 </div>
 
 <script>
-const totalSlides=12;let current=1;
+const totalSlides=17;let current=1;
 const dotsEl=document.getElementById('dots');
 for(let i=1;i<=totalSlides;i++){const d=document.createElement('div');d.className='dot'+(i===1?' active':'');d.onclick=()=>goTo(i);dotsEl.appendChild(d)}
 function goTo(n){document.getElementById('slide-'+current).classList.remove('active');dotsEl.children[current-1].classList.remove('active');current=Math.max(1,Math.min(totalSlides,n));document.getElementById('slide-'+current).classList.add('active');dotsEl.children[current-1].classList.add('active')}
