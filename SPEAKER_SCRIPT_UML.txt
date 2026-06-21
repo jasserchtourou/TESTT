@@ -1,0 +1,159 @@
+===============================================================================
+                 SPEAKER SCRIPT WITH UML DIAGRAMS
+                      System Design Presentation
+===============================================================================
+
+17 SLIDES - Professional UML diagrams included
+Pacing: 15-20 minutes
+
+===============================================================================
+SLIDE 1: TITLE
+===============================================================================
+"I'm walking you through a system design for automating sales briefings.
+Type a municipality name, get a structured briefing in minutes. Let's cover:
+1. Key assumptions 2. Architecture 3. AI integration 4. What ships in 2 weeks"
+
+===============================================================================
+SLIDES 2-3: ASSUMPTIONS
+===============================================================================
+"Critical assumptions that shaped everything:
+- Target best 50k→5k buildings, not all
+- Day-old data acceptable (enables caching)
+- < 5 min latency, < €1.50 cost
+- Users are busy sales engineers (no hallucinated numbers)
+- HubSpot CRM API accessible
+- Building data pre-indexed in PostGIS"
+
+===============================================================================
+SLIDE 4: PRODUCTION ARCHITECTURE (Overview)
+===============================================================================
+"The system runs on AWS:
+Client → React Frontend → AWS ALB → Node.js API → [PostgreSQL, PostGIS, Redis, S3] ↔ [Google Solar, HubSpot]"
+
+===============================================================================
+SLIDE 5: COMPONENT DIAGRAM (UML)
+===============================================================================
+"Shows EVERY component and relationships:
+Sales Engineer → React Frontend → AWS ALB → Node.js API
+
+API connects to:
+├─ Geocoding Service
+├─ Pre-Filter Service
+├─ Solar Calculator
+├─ PV Math Engine
+├─ LLM Service
+└─ Storage: [PostgreSQL, PostGIS, Redis, S3, HubSpot API, Google Solar API]"
+
+===============================================================================
+SLIDE 6: DEPLOYMENT DIAGRAM (UML)
+===============================================================================
+"WHERE everything runs in production AWS:
+User → CloudFront CDN → AWS ALB → ECS Fargate (3+ instances)
+
+Data Layer (all AWS):
+├─ RDS PostgreSQL Multi-AZ
+├─ PostGIS 3dcityDB
+├─ ElastiCache Redis Cluster
+└─ S3 Bucket
+
+External:
+├─ Google Solar API
+└─ HubSpot CRM API
+
+Everything encrypted, redundant, auto-scaling."
+
+===============================================================================
+SLIDE 7: SEQUENCE DIAGRAM (UML) - 7-STEP WORKFLOW
+===============================================================================
+"Exact flow when user searches 'Kirchheim':
+
+1. User searches → Frontend sends request
+2. API calls Geocoding (500ms, cached)
+3. API Pre-Filter: 50k→5k buildings (800ms)
+4. API calls Google Solar API for top 50 only (1-2 min) ← longest
+5. API runs PV Math (100ms, deterministic)
+6. API joins HubSpot CRM data (200ms)
+7. API calls LLM for narrative (2-3 sec)
+→ Return Briefing JSON (2-3 minutes total)"
+
+===============================================================================
+SLIDES 8-14: DESIGN DECISIONS & TRADE-OFFS
+===============================================================================
+
+DESIGN DECISION #1: Municipality Lookup
+"Option A: Exact string match (fast but fragile)
+Option B: Geocoding + fuzzy matching ✓ (robust, handles typos, TTL cache)"
+
+DESIGN DECISION #2: PV Computation
+"Option A: Call Google API for all 50k buildings = €1,500 + 8 hours ❌
+Option B: Pre-filter to 50, call Google only for winners = €1.50 + 2-3 min ✓"
+
+DESIGN DECISION #3: Where AI Fits
+"✓ AI: Address fuzzy matching (NLP)
+✓ AI: Writing narratives (LLM)
+❌ AI: Financial calculations (LLMs hallucinate numbers, risk is too high)
+Solution: AI writes text only, all numbers from deterministic code"
+
+DESIGN DECISION #4: CRM Join
+"❌ Option A: Exact address match (brittle)
+✓ Option B: Fuzzy NLP + coordinate proximity (robust)"
+
+V1 SHIP STRATEGY (2 Weeks):
+"CUT: Full pre-computation (do on-demand instead)
+CUT: Bi-directional CRM sync (read-only for now)
+CUT: AI agent loops (single LLM call, simple)
+KEEP: Core insight (pre-filter → selective API calls)
+
+If this saves sales engineers 3 hours per municipality, we have product-market fit."
+
+===============================================================================
+SLIDE 15: SECURITY & RISK
+===============================================================================
+"Production safeguards:
+- OAuth2 authentication (HubSpot login)
+- TLS 1.3 encryption (data in transit)
+- AWS KMS encryption (data at rest)
+- Rate limiting (1000 req/min per user)
+- Circuit breaker (graceful degradation if APIs fail)
+
+AI risk mitigation:
+- Pydantic schemas validate every output
+- No AI-generated numbers (only text)
+
+Compliance:
+- GDPR: 24-month data retention
+- Audit logs: Every API call recorded
+- SOC2 ready: CloudWatch + Datadog monitoring"
+
+===============================================================================
+SLIDE 16: SUMMARY - THE CORE INSIGHT
+===============================================================================
+"You can't compute 50,000 buildings in 2 minutes.
+
+But you CAN:
+1. Pre-filter to 5,000 via static geometry (fast)
+2. Rank by roof size (highest ROI first)
+3. Call expensive API only for top 50
+4. Join with CRM data via fuzzy matching
+5. Generate narrative with LLM (text only)
+
+Result: 2-3 minutes, €1.50 cost, sales-ready briefing
+
+Every design decision traces back to this insight."
+
+===============================================================================
+SLIDE 17: LIVE DEMO
+===============================================================================
+"Click the button to launch the React prototype.
+This shows the UX. The architecture above is the foundation."
+
+===============================================================================
+KEY PRESENTATION TIPS
+===============================================================================
+- Speak naturally, don't read the script
+- Pause after each key decision (let them absorb)
+- Show confidence in your choices
+- When they ask questions, answer without apologizing
+- UML diagrams matter more than words — point to components
+- Emphasize trade-offs: "We cut X to ship faster because Y"
+- Close with: "Questions on the architecture, the decisions, or the trade-offs?"

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>System Design: Sales Briefing</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0D1B2A;--blue:#1E90FF;--blue2:#4FACFE;--accent:#00F2FE;--white:#FFF;--gray:#A8B2C1;--light:#E8EDF4;--card:rgba(255,255,255,0.05);--border:rgba(255,255,255,0.1)}
+body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overflow:hidden;height:100vh;width:100vw}
+.deck{width:100vw;height:100vh;position:relative}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;background:var(--navy);overflow:hidden}
+.slide.active{display:flex}
+.slide-header{display:flex;align-items:center;justify-content:space-between;padding:14px 40px;background:rgba(30,144,255,0.08);border-bottom:1px solid var(--border);flex-shrink:0}
+.slide-header .brand{font-size:13px;font-weight:700;letter-spacing:2px;color:var(--blue2);text-transform:uppercase}
+.slide-header .slide-num{font-size:12px;color:var(--gray);font-weight:500}
+.slide-body{flex:1;display:flex;flex-direction:column;padding:36px 60px 28px;overflow:auto}
+.slide-title{font-size:36px;font-weight:800;line-height:1.15;background:linear-gradient(135deg,var(--white) 40%,var(--blue2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.slide-subtitle{font-size:15px;color:var(--gray);font-weight:400;margin-bottom:24px}
+.nav{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:12px;z-index:100;align-items:center}
+.nav button{background:rgba(30,144,255,0.15);border:1px solid var(--blue);color:var(--white);padding:10px 24px;border-radius:30px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.nav button:hover{background:var(--blue)}
+.nav .dots{display:flex;gap:6px;align-items:center}
+.nav .dot{width:7px;height:7px;border-radius:50%;background:var(--gray);cursor:pointer;transition:all .2s}
+.nav .dot.active{background:var(--blue);transform:scale(1.4)}
+.key-hint{position:fixed;top:16px;right:24px;font-size:11px;color:var(--gray);z-index:200}
+.grid-bg{position:absolute;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(30,144,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(30,144,255,0.04) 1px,transparent 1px);background-size:40px 40px}
+.title-slide-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 80px;background:radial-gradient(ellipse at 50% 40%,rgba(30,144,255,0.12) 0%,transparent 70%)}
+.title-slide-body .main-title{font-size:52px;font-weight:900;line-height:1.1;background:linear-gradient(135deg,#fff 30%,var(--blue2) 70%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
+.title-slide-body .main-sub{font-size:18px;color:var(--gray);max-width:600px;line-height:1.6;margin-bottom:28px}
+.assumption-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
+.assumption-item .assume-q{font-size:13px;color:var(--blue2);font-weight:700;margin-bottom:8px}
+.assumption-item .assume-a{font-size:13px;color:var(--light);line-height:1.6;margin-bottom:8px}
+.assume-why{font-size:12px;color:var(--gray);font-style:italic}
+.decision-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
+.decision-card .dec-title{font-size:13px;color:var(--accent);font-weight:700;margin-bottom:6px}
+.decision-card .dec-text{font-size:13px;color:var(--light);line-height:1.6}
+.highlight-box{background:rgba(30,144,255,0.08);border:1px solid rgba(30,144,255,0.3);border-radius:12px;padding:16px 20px}
+.highlight-box p{font-size:13px;color:var(--light);line-height:1.7}
+.two-col{display:flex;gap:32px;flex:1}
+.col{flex:1;display:flex;flex-direction:column;gap:14px}
+.bullets-compact{list-style:none;display:flex;flex-direction:column;gap:10px}
+.bullets-compact li{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--light);line-height:1.5}
+.bullets-compact li .dot-b{width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:6px}
+.cta-btn{display:inline-block;background:linear-gradient(135deg,var(--blue),var(--accent));color:#0D1B2A;padding:16px 40px;border-radius:40px;font-family:'Inter',sans-serif;font-size:16px;font-weight:700;text-decoration:none;transition:all .25s;letter-spacing:.5px;cursor:pointer;border:none}
+.cta-btn:hover{transform:scale(1.05);box-shadow:0 0 30px rgba(30,144,255,0.4)}
+
+/* Architecture diagram styles */
+.arch-container{flex:1;display:flex;flex-direction:column;justify-content:center;gap:20px;font-size:13px}
+.arch-layer{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:12px}
+.layer-title{font-size:12px;font-weight:700;color:var(--blue2);text-transform:uppercase;margin-bottom:12px;letter-spacing:1px}
+.layer-content{display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap}
+.component{background:rgba(30,144,255,0.1);border:1px solid rgba(30,144,255,0.4);border-radius:8px;padding:12px 16px;flex:1;min-width:140px;text-align:center}
+.component .comp-name{font-weight:700;color:var(--blue2);margin-bottom:4px}
+.component .comp-desc{font-size:11px;color:var(--gray)}
+.component.critical{background:rgba(0,242,254,0.08);border-color:rgba(0,242,254,0.4)}
+.component.critical .comp-name{color:var(--accent)}
+.data-flow{display:flex;align-items:center;justify-content:space-between;padding:16px 0;background:rgba(30,144,255,0.04);border-radius:8px;padding:16px}
+.data-flow .step{flex:1;text-align:center}
+.data-flow .step-num{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:4px}
+.data-flow .step-text{font-size:12px;color:var(--light)}
+.data-flow .arrow{color:var(--blue2);font-size:20px;padding:0 8px}
+.timeline-item{background:var(--card);border-left:3px solid var(--blue);padding:12px 16px;margin-bottom:10px;border-radius:4px}
+.timeline-item .time{font-size:11px;color:var(--accent);font-weight:700;margin-bottom:4px}
+.timeline-item .desc{font-size:13px;color:var(--light)}
+</style>
+</head>
+<body>
+<div class="key-hint">Arrow keys to navigate</div>
+<div class="deck" id="deck">
+
+<!-- SLIDE 1 — Title -->
+<div class="slide active" id="slide-1">
+  <div class="grid-bg"></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">01 / 12</span></div>
+  <div class="title-slide-body">
+    <div class="main-title">Sales Briefing System</div>
+    <div class="main-sub">Type "Gemeinde Kirchheim" → Get a structured briefing in minutes</div>
+    <div style="margin-top:40px;max-width:700px;text-align:left;background:rgba(30,144,255,0.08);border:1px solid rgba(30,144,255,0.3);border-radius:12px;padding:24px">
+      <p style="font-size:14px;color:var(--light);line-height:1.8"><strong>What we'll cover:</strong><br><br>
+      1️⃣ The assumptions that shaped the design<br>
+      2️⃣ System architecture and data flow<br>
+      3️⃣ Where AI creates value, and where it doesn't<br>
+      4️⃣ What ships in two weeks</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 2 — Assumptions (Part 1) -->
+<div class="slide" id="slide-2">
+  <div class="grid-bg"></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">02 / 12</span></div>
+  <div class="slide-body">
+    <div class="slide-title">Clarifying Assumptions</div>
+    <div class="slide-subtitle">Critical questions that shaped the architecture</div>
+
+    <div class="assumption-item">
+      <div class="assume-q">❓ "Are we targeting all 50,000 buildings, or the best ones?"</div>
+      <div class="assume-a"><strong>I assumed:</strong> Focus on high-ROI targets (roof area > 200 m²).</div>
+      <div class="assume-why">Why: Filters 50k buildings → 5k qualifying → 50 API calls. Reduces cost by 99%.</div>
+    </div>
+
+    <div class="assumption-item">
+      <div class="assume-q">❓ "How fresh does the solar data need to be?"</div>
+      <div class="assume-a"><strong>I assumed:</strong> Daily-stale data is acceptable.</div>
+      <div class="assume-why">Why: Enables caching → sub-second response on repeat queries.</div>
+    </div>
+
+    <div class="assumption-item">
+      <div class="assume-q">❓ "What's the max latency and budget per briefing?"</div>
+      <div class="assume-a"><strong>I assumed:</strong> < 5 minutes, < €1.50 per call.</div>
+      <div class="assume-why">Why: Determines pre-computation vs on-demand strategy.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3 — Assumptions (Part 2) -->
+<div class="slide" id="slide-3">
+  <div class="grid-bg"></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">03 / 12</span></div>
+  <div class="slide-body">
+    <div class="slide-title">More Clarifying Assumptions</div>
+    <div class="slide-subtitle">Additional constraints that shaped design decisions</div>
+
+    <div class="assumption-item">
+      <div class="assume-q">❓ "Who is the primary user?"</div>
+      <div class="assume-a"><strong>I assumed:</strong> Sales engineers. They're busy. Speed and accuracy matter.</div>
+      <div class="assume-why">Why: Shapes UX and drives decision: never let AI invent financial numbers.</div>
+    </div>
+
+    <div class="assumption-item">
+      <div class="assume-q">❓ "Is the CRM data accessible via API?"</div>
+      <div class="assume-a"><strong>I assumed:</strong> HubSpot API access exists.</div>
+      <div class="assume-why">Why: Enables joining briefings to active deals by fuzzy address matching.</div>
+    </div>
+
+    <div class="assumption-item">
+      <div class="assume-q">❓ "Is building geometry data pre-indexed?"</div>
+      <div class="assume-a"><strong>I assumed:</strong> Yes, in a PostGIS database.</div>
+      <div class="assume-why">Why: Makes pre-filtering fast. Raw GeoJSON parsing = latency explosion.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4 — System Architecture -->
+<div class="slide" id="slide-4">
+  <div class="grid-bg"></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">04 / 12</span></div>
+  <div class="slide-body">
+    <div class="slide-title">System Architecture</div>
+    <div class="slide-subtitle">Complete stack: from user input to briefing output</div>
+
+    <div class="arch-container">
+      <!-- Presentation Layer -->
+      <div class="arch-layer">
+        <div class="layer-title">📱 Presentation Layer</div>
+        <div class="layer-content">
+          <div class="component">
+            <div class="comp-name">React Frontend</div>
+            <div class="comp-desc">Search form, briefing display, PDF export</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API & Cache Layer -->
+      <div class="arch-layer">
+        <div class="layer-title">🔧 Orchestration & Cache Layer</div>
+        <div class="layer-content">
+          <div class="component critical">
+            <div class="comp-name">API Server</div>
+            <div class="comp-desc">Node.js/Express orchestrator</div>
+          </div>
+          <div class="component">
+            <div class="comp-name">Redis Cache</div>
+            <div class="comp-desc">Geocoding, solar results, CRM joins</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Sources -->
+      <div class="arch-layer">
+        <div class="layer-title">🗄️ Data Sources & External Services</div>
+        <div class="layer-content">
+          <div class="component">
+            <div class="comp-name">Geocoder</div>
+            <div class="comp-desc">OSM API → coordinates</div>
+          </div>
+          <div class="component critical">
+            <div class="comp-name">3dcityDB</div>
+            <div class="comp-desc">PostGIS indexed buildings</div>
+          </div>
+          <div class="component">
+            <div class="comp-name">Google Solar API</div>
+            <div class="comp-desc">PV potential for roofs</div>
+          </div>
+          <div class="component">
+            <div class="comp-name">HubSpot CRM</div>
+            <div class="comp-desc">Deals & contact data</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Processing -->
+      <div class="arch-layer">
+        <div class="layer-title">⚙️ Processing & Output</div>
+        <div class="layer-content">
+          <div class="component">
+            <div class="comp-name">PV Calculator</div>
+            <div class="comp-desc">Deterministic math</div>
+          </div>
+          <div class="component">
+            <div class="comp-name">LLM Engine</div>
+            <div class="comp-desc">Narrative only</div>
+          </div>
+          <div class="component critical">
+            <div class="comp-name">Briefing JSON</div>
+            <div class="comp-desc">Structured output</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight-box" style="margin-top:12px">
+      <p><strong>Key Principle:</strong> Reduce expensive API calls by 99% through intelligent pre-filtering of static data. Only call expensive APIs for top candidates.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5 — Data Flow / Workflow -->
+<div class="slide" id="slide-5">
+  <div class="grid-bg"></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">05 / 12</span></div>
+  <div class="slide-body">
+    <div class="slide-title">Request Workflow</div>
+    <div class="slide-subtitle">Step-by-step execution when user searches "Gemeinde Kirchheim"</div>
+
+    <div class="timeline-item">
+      <div class="time">Step 1 — Geocoding (500ms, cached)</div>
+      <div class="desc">"Kirchheim" → fuzzy match → AGS code 09175124 + bounding box</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="time">Step 2 — Building Pre-Filter (800ms)</div>
+      <div class="desc">Query 3dcityDB: all buildings in bbox → filter roof area > 200 m² → sort by area</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="time">Step 3 — Solar Calculation (1-2 min, parallelized)</div>
+      <div class="desc">Call Google Solar API for top 50 buildings. Returns: potential kWh/year, irradiance</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="time">Step 4 — PV Math (100ms)</div>
+      <div class="desc">Deterministic: kWp = roof_area × insolation × efficiency. Payback = capex ÷ annual_savings</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="time">Step 5 — CRM Join (200ms)</div>
+      <div class="desc">Fuzzy address match: link buildings to HubSpot deals. Attach deal status + contact info</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="time">Step 6 — LLM Narrative (2-3s)</div>
+      <div class="desc">Generate summary: "Kirchheim has X buildings, Y MWp potential, Z CO₂ impact." AI writes text only.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="time">Step 7 — Return (immediate)</div>
+      <div class="desc">Structured JSON: municipality data, solar results, CRM context, recommendation</div>
+    </div>
+
+    <div class="highlight-box" style="margin-top:12px">
+      <p><strong>Total Latency: 2-3 minutes</strong> (mostly Step 3 Google API calls) | <strong>Cost: €1.50</strong> (50 calls × €0.03)</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6 — Design Decision #1 - Municipality Lookup -->
+<div class="slide" id="slide-6">
+  <div class="grid-bg"></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">06 / 12</span></div>
+  <div class="slide-body">
+    <div class="slide-title">Design Decision #1: Municipality Lookup</div>
+    <div class="slide-subtitle">How does "Kirchheim" become a searchable geographic area?</div>
+
+    <div class="decision-card">
+      <div class="dec-title">❌ Option A: Exact string match in database</div>
+      <div class="dec-text">Search 16,000 German municipalities for "Kirchheim". Fast, but fragile. Fails on typos, abbreviations, spacing variations.</div>
+    </div>
+
+    <div class="decision-card">
+      <div class="dec-title">✅ Option B: Geocoding with fuzzy matching + caching</div>
+      <div class="dec-text">Call geocoder (OpenStreetMap) with fuzzy matching. Returns municipality bounds + AGS code. Cache result. 1-2s on first query, instant on repeat.</div>
+    </div>
+
+    <div class="highlight-box">
+      <p><strong>Why Option B wins:</strong> Handles typos and variations. Returns the standardized AGS code, which every system (CRM, 3dcityDB) uses to join data. Caching eliminates latency on second query.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7 — Design Decision #2 - PV Triggers -->
+<div class="slide" id="slide-7">
+  <div class="grid-bg"></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">07 / 12</span></div>
+  <div class="slide-body">
+    <div class="slide-title">Design Decision #2: PV Computation Strategy</div>
+    <div class="slide-subtitle">How do we avoid calling Google Solar API 50,000 times?</div>
+
+    <div class="decision-card">
+      <div class="dec-title">❌ Naive Approach: Compute all buildings</div>
+      <div class="dec-text">50,000 buildings × €0.03/call = €1,500 per briefing. 50,000 ÷ 100 calls/min = 500 minutes (8+ hours). Unacceptable.</div>
+    </div>
+
+    <div class="decision-card">
+      <div class="dec-title">✅ Smart Approach: Pre-filter → top 50 only</div>
+      <div class="dec-text">Filter buildings by roof area (5k qualify). Rank by size. Call Google API only for top 50. Cost: €1.50. Time: 1-2 minutes.</div>
+    </div>
+
+    <div class="highlight-box">
+      <p><strong>The Insight:</strong> A sales engineer cares about the best 10 buildings, not all 50,000. Building geometry is static, so pre-filtering is fast and cheap. Call expensive APIs only for the winners.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 8 — Design Decision #3 - AI Role -->
+<div class="slide" id="slide-8">
+  <div class="grid-bg"></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">08 / 12</span></div>
+  <div class="slide-body">
+    <div class="slide-title">Design Decision #3: Where AI Fits</div>
+    <div class="slide-subtitle">When AI creates value, and when it creates risk</div>
+
+    <div class="decision-card">
+      <div class="dec-title">✅ AI: Address fuzzy matching</div>
+      <div class="dec-text">Match "Rathaus, Kirchheim" against "Town Hall, Kirchheim" in CRM. NLP beats regex.</div>
+    </div>
+
+    <div class="decision-card">
+      <div class="dec-title">✅ AI: Narrative generation</div>
+      <div class="dec-text">Generate contextual summary: "Strong irradiance + existing relationship. Open with Rathaus as anchor." LLMs excel at this.</div>
+    </div>
+
+    <div class="decision-card">
+      <div class="dec-title">❌ AI: Financial calculations</div>
+      <div class="dec-text">Never. LLMs hallucinate numbers. An invented 500 kWp system destroys credibility.</div>
+    </div>
+
+    <div class="highlight-box">
+      <p><strong>Risk Mitigation:</strong> AI writes only text. All numbers come from deterministic code. Pydantic schemas validate every field.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 9 — Design Decision #4 - CRM Join -->
+<div class="slide" id="slide-9">
+  <div class="grid-bg"></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">09 / 12</span></div>
+  <div class="slide-body">
+    <div class="slide-title">Design Decision #4: CRM Data Join</div>
+    <div class="slide-subtitle">Linking buildings to deals without a common key</div>
+
+    <div class="decision-card">
+      <div class="dec-title">❌ Exact address match</div>
+      <div class="dec-text">"Hauptstraße 12" vs "Hauptstr. 12" vs "Main Street 12" fail to match. Brittle.</div>
+    </div>
+
+    <div class="decision-card">
+      <div class="dec-title">✅ Fuzzy address match + coordinate proximity</div>
+      <div class="dec-text">Use NLP to compare addresses (handles variations + typos). Also compare lat/lon (catches name variations). Store HubSpot deal metadata in result.</div>
+    </div>
+
+    <div class="highlight-box">
+      <p><strong>Output:</strong> Briefing includes deal context: "2 active deals · Last contact: 3 weeks ago · Key contact: Hans Müller"</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 10 — Trade-offs: What to Cut -->
+<div class="slide" id="slide-10">
+  <div class="grid-bg"></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">10 / 12</span></div>
+  <div class="slide-body">
+    <div class="slide-title">V1 Trade-offs: What Ships in 2 Weeks</div>
+    <div class="slide-subtitle">Shipping means cutting features that don't prove the core idea</div>
+
+    <div class="decision-card">
+      <div class="dec-title">❌ Cut: Full city pre-computation</div>
+      <div class="dec-text">V1: Compute on-demand (2-3 min). V2: Pre-compute solar data at night, serve from cache (instant). V1 proves value faster.</div>
+    </div>
+
+    <div class="decision-card">
+      <div class="dec-title">❌ Cut: Bi-directional CRM sync</div>
+      <div class="dec-text">V1: Read-only CRM data. V2: Push solar scores back to HubSpot deals. Read-only is simpler.</div>
+    </div>
+
+    <div class="decision-card">
+      <div class="dec-title">❌ Cut: Multi-step AI agent</div>
+      <div class="dec-text">V1: One LLM call, one narrative. V2: Agentic loop with brainstorming. Simple is better.</div>
+    </div>
+
+    <div class="decision-card">
+      <div class="dec-title">✅ Keep: Core insight</div>
+      <div class="dec-text">Pre-filter + selective API calls + deterministic math + LLM narrative. If this saves sales engineers 3 hours per municipality, we have product-market fit.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 11 — Summary -->
+<div class="slide" id="slide-11">
+  <div class="grid-bg"></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">11 / 12</span></div>
+  <div class="slide-body" style="align-items:center;justify-content:center;text-align:center">
+    <div class="slide-title" style="margin-bottom:16px">The Core Architectural Insight</div>
+    <div class="slide-subtitle" style="margin-bottom:32px">Everything flows from one principle</div>
+
+    <div style="max-width:800px;background:rgba(30,144,255,0.08);border:1px solid rgba(30,144,255,0.3);border-radius:12px;padding:32px;margin-bottom:32px">
+      <p style="font-size:16px;color:var(--light);line-height:1.9;margin-bottom:20px">
+        <strong>You cannot compute PV for 50,000 buildings in minutes.</strong><br><br>
+        But you CAN do this:<br><br>
+        1️⃣ Pre-filter 50k buildings to 5k via static geometry<br>
+        2️⃣ Rank by roof size (biggest = highest ROI)<br>
+        3️⃣ Call Google Solar API only for top 50<br>
+        4️⃣ Join with CRM data via fuzzy matching<br>
+        5️⃣ Generate narrative with LLM (deterministic numbers only)
+      </p>
+      <p style="font-size:14px;color:var(--gray)">Result: 2-3 minutes, €1.50 cost, sales-ready briefing</p>
+    </div>
+
+    <p style="font-size:13px;color:var(--light)">This is the design. Every decision traces back to an assumption or a constraint.</p>
+  </div>
+</div>
+
+<!-- SLIDE 12 — Live Demo -->
+<div class="slide" id="slide-12">
+  <div class="grid-bg"></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">12 / 12</span></div>
+  <div class="slide-body" style="align-items:center;justify-content:center;text-align:center">
+    <div class="slide-title" style="margin-bottom:16px">Live Demonstration</div>
+    <div class="slide-subtitle">Interactive prototype of the user interface</div>
+    <button class="cta-btn" onclick="launchDevServer()" style="margin-top:32px;cursor:pointer">Launch Interactive UI</button>
+    <p style="margin-top:20px;font-size:12px;color:var(--gray)">Starts the React development server and opens the prototype</p>
+  </div>
+</div>
+
+</div>
+
+<div class="nav">
+  <button onclick="changeSlide(-1)">← Prev</button>
+  <div class="dots" id="dots"></div>
+  <button onclick="changeSlide(1)">Next →</button>
+</div>
+
+<script>
+const totalSlides=12;let current=1;
+const dotsEl=document.getElementById('dots');
+for(let i=1;i<=totalSlides;i++){const d=document.createElement('div');d.className='dot'+(i===1?' active':'');d.onclick=()=>goTo(i);dotsEl.appendChild(d)}
+function goTo(n){document.getElementById('slide-'+current).classList.remove('active');dotsEl.children[current-1].classList.remove('active');current=Math.max(1,Math.min(totalSlides,n));document.getElementById('slide-'+current).classList.add('active');dotsEl.children[current-1].classList.add('active')}
+function changeSlide(dir){goTo(current+dir)}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown')changeSlide(1);if(e.key==='ArrowLeft'||e.key==='ArrowUp')changeSlide(-1)});
+
+function launchDevServer(){
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'Starting...';
+
+  fetch('http://localhost:3000/start-dev',{method:'POST'})
+    .then(r=>r.json())
+    .then(d=>{
+      if(d.success && d.url){
+        setTimeout(()=>{window.open(d.url,'briefing_ui')},1500);
+        btn.textContent = '✓ Opened!';
+      } else {
+        alert('Error: '+d.error);
+        btn.disabled = false;
+        btn.textContent = 'Launch Interactive UI';
+      }
+    })
+    .catch(e=>{
+      alert('Error launching dev server. Is the server running?');
+      btn.disabled = false;
+      btn.textContent = 'Launch Interactive UI';
+    });
+}
+</script>
+</body>
+</html>
