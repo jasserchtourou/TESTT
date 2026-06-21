@@ -121,41 +121,96 @@ svg{max-width:100%;height:auto}
   </div>
 </div>
 
-<!-- SLIDE 4: PRODUCTION ARCHITECTURE OVERVIEW -->
+<!-- SLIDE 4: PRODUCTION ARCHITECTURE -->
 <div class="slide" id="slide-4">
   <div class="grid-bg"></div>
   <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">04 / 17</span></div>
   <div class="slide-body">
-    <div class="slide-title">System Architecture (Overview)</div>
+    <div class="slide-title">System Architecture</div>
     <div class="slide-subtitle">Complete stack: from user input to briefing output</div>
-    <div class="diagram-container" style="gap:12px">
-      <div style="text-align:center">
-        <div class="arch-box" style="min-width:120px">📱 React Frontend</div>
+    <style>
+      .arch-container{flex:1;display:flex;flex-direction:column;justify-content:center;gap:20px;font-size:13px}
+      .arch-layer{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:12px}
+      .layer-title{font-size:12px;font-weight:700;color:var(--blue2);text-transform:uppercase;margin-bottom:12px;letter-spacing:1px}
+      .layer-content{display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap}
+      .component{background:rgba(30,144,255,0.1);border:1px solid rgba(30,144,255,0.4);border-radius:8px;padding:12px 16px;flex:1;min-width:140px;text-align:center}
+      .component .comp-name{font-weight:700;color:var(--blue2);margin-bottom:4px}
+      .component .comp-desc{font-size:11px;color:var(--gray)}
+      .component.critical{background:rgba(0,242,254,0.08);border-color:rgba(0,242,254,0.4)}
+      .component.critical .comp-name{color:var(--accent)}
+    </style>
+    <div class="arch-container">
+      <!-- Presentation Layer -->
+      <div class="arch-layer">
+        <div class="layer-title">📱 Presentation Layer</div>
+        <div class="layer-content">
+          <div class="component">
+            <div class="comp-name">React Frontend</div>
+            <div class="comp-desc">Search form, briefing display, PDF export</div>
+          </div>
+        </div>
       </div>
-      <div class="arch-arrow">→</div>
-      <div style="text-align:center">
-        <div class="arch-box critical" style="min-width:120px">🔧 API Server</div>
+
+      <!-- API & Cache Layer -->
+      <div class="arch-layer">
+        <div class="layer-title">🔧 Orchestration & Cache Layer</div>
+        <div class="layer-content">
+          <div class="component critical">
+            <div class="comp-name">API Server</div>
+            <div class="comp-desc">Node.js/Express orchestrator</div>
+          </div>
+          <div class="component">
+            <div class="comp-name">Redis Cache</div>
+            <div class="comp-desc">Geocoding, solar results, CRM joins</div>
+          </div>
+        </div>
       </div>
-      <div class="arch-arrow">→</div>
-      <div style="text-align:center">
-        <div class="arch-box" style="min-width:140px">🗄️ PostgreSQL<br>PostGIS</div>
+
+      <!-- Data Sources -->
+      <div class="arch-layer">
+        <div class="layer-title">🗄️ Data Sources & External Services</div>
+        <div class="layer-content">
+          <div class="component">
+            <div class="comp-name">Geocoder</div>
+            <div class="comp-desc">OSM API → coordinates</div>
+          </div>
+          <div class="component critical">
+            <div class="comp-name">3dcityDB</div>
+            <div class="comp-desc">PostGIS indexed buildings</div>
+          </div>
+          <div class="component">
+            <div class="comp-name">Google Solar API</div>
+            <div class="comp-desc">PV potential for roofs</div>
+          </div>
+          <div class="component">
+            <div class="comp-name">HubSpot CRM</div>
+            <div class="comp-desc">Deals & contact data</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Processing -->
+      <div class="arch-layer">
+        <div class="layer-title">⚙️ Processing & Output</div>
+        <div class="layer-content">
+          <div class="component">
+            <div class="comp-name">PV Calculator</div>
+            <div class="comp-desc">Deterministic math</div>
+          </div>
+          <div class="component">
+            <div class="comp-name">LLM Engine</div>
+            <div class="comp-desc">Narrative only</div>
+          </div>
+          <div class="component critical">
+            <div class="comp-name">Briefing JSON</div>
+            <div class="comp-desc">Structured output</div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="diagram-container" style="gap:12px;margin-top:20px">
-      <div style="text-align:center">
-        <div class="arch-box" style="min-width:120px">☁️ AWS<br>Fargate</div>
-      </div>
-      <div class="arch-arrow">↔</div>
-      <div style="text-align:center">
-        <div class="arch-box" style="min-width:120px">💾 Redis<br>Cache</div>
-      </div>
-      <div class="arch-arrow">↔</div>
-      <div style="text-align:center">
-        <div class="arch-box" style="min-width:120px">🔗 External<br>APIs</div>
-      </div>
-    </div>
-    <div class="highlight-box" style="margin-top:16px">
-      <p><strong>Key Principle:</strong> Reduce expensive API calls by 99% through intelligent pre-filtering of static data. Only compute winners.</p>
+
+    <div class="highlight-box" style="margin-top:12px">
+      <p><strong>Key Principle:</strong> Reduce expensive API calls by 99% through intelligent pre-filtering of static data. Only call expensive APIs for top candidates.</p>
     </div>
   </div>
 </div>
@@ -244,99 +299,109 @@ svg{max-width:100%;height:auto}
   </div>
 </div>
 
-<!-- SLIDE 6: DEPLOYMENT DIAGRAM -->
+<!-- SLIDE 6: SEQUENCE DIAGRAM -->
 <div class="slide" id="slide-6">
   <div class="grid-bg"></div>
   <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">06 / 17</span></div>
   <div class="slide-body">
-    <div class="slide-title">Deployment Diagram</div>
-    <div class="slide-subtitle">Production AWS infrastructure</div>
+    <div class="slide-title">Sequence Diagram</div>
+    <div class="slide-subtitle">7-step workflow when user searches "Kirchheim"</div>
     <div class="diagram-container">
-      <svg viewBox="0 0 1200 650" style="max-width:100%;height:100%">
+      <svg viewBox="0 0 1000 700" style="max-width:100%;height:100%">
         <defs>
           <style>
-            .layer-box { fill: rgba(30,144,255,0.08); stroke: rgba(30,144,255,0.5); stroke-width: 2; stroke-dasharray: 5,5; }
-            .service-box { fill: rgba(30,144,255,0.1); stroke: rgba(30,144,255,0.6); stroke-width: 2; }
-            .service-critical { fill: rgba(0,242,254,0.1); stroke: rgba(0,242,254,0.8); }
-            .text-main { font-family: Inter, sans-serif; font-size: 13px; fill: #FFF; font-weight: 700; }
-            .text-small { font-family: Inter, sans-serif; font-size: 11px; fill: #A8B2C1; }
-            .arrow { stroke: rgba(30,144,255,0.6); stroke-width: 2; fill: none; marker-end: url(#arrowhead2); }
+            .seq-actor { fill: rgba(30,144,255,0.1); stroke: rgba(30,144,255,0.6); stroke-width: 2; }
+            .seq-text { font-family: Inter, sans-serif; font-size: 12px; fill: #FFF; font-weight: 600; text-anchor: middle; }
+            .seq-label { font-family: Inter, sans-serif; font-size: 11px; fill: #A8B2C1; }
+            .seq-line { stroke: rgba(30,144,255,0.5); stroke-width: 2; stroke-dasharray: 2,4; }
+            .seq-arrow { stroke: rgba(30,144,255,0.7); stroke-width: 2; fill: none; marker-end: url(#arrowseq); }
+            .seq-step { fill: rgba(0,242,254,0.1); stroke: rgba(0,242,254,0.6); stroke-width: 1; }
+            .seq-number { font-family: Inter, sans-serif; font-size: 13px; font-weight: 700; fill: var(--accent); }
           </style>
-          <marker id="arrowhead2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+          <marker id="arrowseq" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
             <polygon points="0 0, 10 3, 0 6" fill="rgba(30,144,255,0.8)" />
           </marker>
         </defs>
 
-        <!-- CDN Layer -->
-        <rect x="50" y="20" width="150" height="80" rx="4" class="layer-box" />
-        <text x="125" y="45" class="text-main">📡 CDN</text>
-        <rect x="70" y="55" width="110" height="35" rx="3" class="service-box" />
-        <text x="125" y="77" class="text-small">CloudFront</text>
+        <!-- Actors -->
+        <rect x="30" y="10" width="80" height="40" rx="4" class="seq-actor" />
+        <text x="70" y="35" class="seq-text">User</text>
+        <line x1="70" y1="50" x2="70" y2="680" class="seq-line" />
 
-        <!-- AWS Layer -->
-        <rect x="50" y="130" width="1100" height="450" rx="4" class="layer-box" />
-        <text x="70" y="155" class="text-main">☁️ AWS</text>
+        <rect x="160" y="10" width="80" height="40" rx="4" class="seq-actor" />
+        <text x="200" y="35" class="seq-text">API</text>
+        <line x1="200" y1="50" x2="200" y2="680" class="seq-line" />
 
-        <!-- ALB -->
-        <rect x="100" y="180" width="100" height="50" rx="3" class="service-box service-critical" />
-        <text x="150" y="210" class="text-small">AWS ALB</text>
+        <rect x="290" y="10" width="90" height="40" rx="4" class="seq-actor" />
+        <text x="335" y="35" class="seq-text">Geocoder</text>
+        <line x1="335" y1="50" x2="335" y2="680" class="seq-line" />
 
-        <!-- ECS Instances -->
-        <rect x="250" y="180" width="90" height="50" rx="3" class="service-box" />
-        <text x="295" y="205" class="text-small">ECS-1</text>
+        <rect x="440" y="10" width="90" height="40" rx="4" class="seq-actor" />
+        <text x="485" y="35" class="seq-text">3dcityDB</text>
+        <line x1="485" y1="50" x2="485" y2="680" class="seq-line" />
 
-        <rect x="360" y="180" width="90" height="50" rx="3" class="service-box" />
-        <text x="405" y="205" class="text-small">ECS-2</text>
+        <rect x="580" y="10" width="90" height="40" rx="4" class="seq-actor" />
+        <text x="625" y="35" class="seq-text">Solar API</text>
+        <line x1="625" y1="50" x2="625" y2="680" class="seq-line" />
 
-        <rect x="470" y="180" width="90" height="50" rx="3" class="service-box" />
-        <text x="515" y="205" class="text-small">ECS-3</text>
+        <rect x="720" y="10" width="90" height="40" rx="4" class="seq-actor" />
+        <text x="765" y="35" class="seq-text">LLM</text>
+        <line x1="765" y1="50" x2="765" y2="680" class="seq-line" />
 
-        <!-- Data Layer -->
-        <!-- RDS -->
-        <rect x="100" y="290" width="90" height="50" rx="3" class="service-box service-critical" />
-        <text x="145" y="315" class="text-small">RDS</text>
-        <text x="145" y="328" class="text-small">PostgreSQL</text>
+        <!-- Step 1: Search -->
+        <rect x="50" y="75" width="120" height="30" rx="3" class="seq-step" />
+        <text x="110" y="90" class="seq-number">1️⃣</text>
+        <text x="170" y="90" class="seq-label">User searches "Kirchheim"</text>
+        <path d="M 70 105 L 200 125" class="seq-arrow" />
 
-        <!-- PostGIS -->
-        <rect x="210" y="290" width="90" height="50" rx="3" class="service-box service-critical" />
-        <text x="255" y="315" class="text-small">PostGIS</text>
-        <text x="255" y="328" class="text-small">3dcityDB</text>
+        <!-- Step 2: Geocoding -->
+        <rect x="210" y="130" width="100" height="30" rx="3" class="seq-step" />
+        <text x="260" y="145" class="seq-number">2️⃣</text>
+        <text x="330" y="145" class="seq-label">Geocoding (500ms)</text>
+        <path d="M 200 160 L 335 180" class="seq-arrow" />
+        <path d="M 335 190 L 200 210" class="seq-arrow" style="stroke-dasharray:5,5" />
 
-        <!-- Redis -->
-        <rect x="320" y="290" width="90" height="50" rx="3" class="service-box" />
-        <text x="365" y="315" class="text-small">ElastiCache</text>
-        <text x="365" y="328" class="text-small">Redis</text>
+        <!-- Step 3: Pre-Filter -->
+        <rect x="210" y="215" width="100" height="30" rx="3" class="seq-step" />
+        <text x="260" y="230" class="seq-number">3️⃣</text>
+        <text x="330" y="230" class="seq-label">Pre-Filter (800ms)</text>
+        <path d="M 200 245 L 485 265" class="seq-arrow" />
+        <path d="M 485 275 L 200 295" class="seq-arrow" style="stroke-dasharray:5,5" />
 
-        <!-- S3 -->
-        <rect x="430" y="290" width="90" height="50" rx="3" class="service-box" />
-        <text x="475" y="315" class="text-small">S3</text>
-        <text x="475" y="328" class="text-small">Bucket</text>
+        <!-- Step 4: Solar API -->
+        <rect x="210" y="300" width="100" height="30" rx="3" class="seq-step" />
+        <text x="260" y="315" class="seq-number">4️⃣</text>
+        <text x="330" y="315" class="seq-label">Solar API (1-2min)</text>
+        <path d="M 200 330 L 625 350" class="seq-arrow" />
+        <path d="M 625 360 L 200 380" class="seq-arrow" style="stroke-dasharray:5,5" />
 
-        <!-- External APIs -->
-        <rect x="600" y="290" width="100" height="50" rx="3" class="service-box" />
-        <text x="650" y="313" class="text-small">Google Solar</text>
-        <text x="650" y="328" class="text-small">API</text>
+        <!-- Step 5: PV Math -->
+        <rect x="210" y="385" width="100" height="30" rx="3" class="seq-step" />
+        <text x="260" y="400" class="seq-number">5️⃣</text>
+        <text x="330" y="400" class="seq-label">PV Math (100ms)</text>
+        <path d="M 200 415 L 200 435" class="seq-arrow" />
 
-        <rect x="730" y="290" width="100" height="50" rx="3" class="service-box" />
-        <text x="780" y="313" class="text-small">HubSpot</text>
-        <text x="780" y="328" class="text-small">CRM</text>
+        <!-- Step 6: CRM Join -->
+        <rect x="210" y="440" width="100" height="30" rx="3" class="seq-step" />
+        <text x="260" y="455" class="seq-number">6️⃣</text>
+        <text x="330" y="455" class="seq-label">CRM Join (200ms)</text>
+        <path d="M 200 470 L 200 490" class="seq-arrow" />
 
-        <!-- Security -->
-        <text x="70" y="400" class="text-main">🔐 Security & Monitoring</text>
-        <text x="100" y="425" class="text-small">• TLS 1.3 encryption (transit)</text>
-        <text x="100" y="445" class="text-small">• AWS KMS encryption (at rest)</text>
-        <text x="100" y="465" class="text-small">• CloudWatch + Datadog monitoring</text>
-        <text x="100" y="485" class="text-small">• Rate limiting: 1000 req/min</text>
-        <text x="100" y="505" class="text-small">• Circuit breaker for API failures</text>
+        <!-- Step 7: LLM -->
+        <rect x="210" y="495" width="100" height="30" rx="3" class="seq-step" />
+        <text x="260" y="510" class="seq-number">7️⃣</text>
+        <text x="330" y="510" class="seq-label">LLM Narrative (2-3s)</text>
+        <path d="M 200 525 L 765 545" class="seq-arrow" />
+        <path d="M 765 555 L 200 575" class="seq-arrow" style="stroke-dasharray:5,5" />
 
-        <!-- Arrows -->
-        <path d="M 125 100 L 150 180" class="arrow" />
-        <path d="M 150 230 L 295 180" class="arrow" />
-        <path d="M 150 230 L 405 180" class="arrow" />
-        <path d="M 150 230 L 515 180" class="arrow" />
-        <path d="M 295 230 L 145 290" class="arrow" />
-        <path d="M 295 230 L 255 290" class="arrow" />
-        <path d="M 295 230 L 365 290" class="arrow" />
+        <!-- Return -->
+        <rect x="50" y="580" width="120" height="30" rx="3" class="seq-step" />
+        <text x="110" y="595" class="seq-number">✓</text>
+        <text x="170" y="595" class="seq-label">Return Briefing JSON</text>
+        <path d="M 200 605 L 110 610" class="seq-arrow" />
+
+        <!-- Timing -->
+        <text x="50" y="650" class="seq-text" style="font-size:13px;text-anchor:start;font-weight:700">Total: 2-3 minutes | Cost: €1.50 (50 API calls × €0.03)</text>
       </svg>
     </div>
   </div>
