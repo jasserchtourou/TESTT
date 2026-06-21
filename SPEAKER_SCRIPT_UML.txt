@@ -3,157 +3,508 @@
                       System Design Presentation
 ===============================================================================
 
-17 SLIDES - Professional UML diagrams included
-Pacing: 15-20 minutes
+17 SLIDES - Professional UML diagrams with Mermaid
+Pacing: 18-22 minutes (natural delivery pace)
+Key: Speak naturally, pause after diagrams, emphasize trade-offs
 
 ===============================================================================
-SLIDE 1: TITLE
+SLIDE 1: TITLE SLIDE
 ===============================================================================
+[Confident, clear tone]
+
 "I'm walking you through a system design for automating sales briefings.
-Type a municipality name, get a structured briefing in minutes. Let's cover:
-1. Key assumptions 2. Architecture 3. AI integration 4. What ships in 2 weeks"
+The problem is straightforward: sales engineers spend 2-4 hours researching
+building data, solar potential, and CRM context for each municipality.
+
+This system does it in 2-3 minutes for €1.50.
+
+Here's what we'll cover:
+1. The key assumptions that shaped the design
+2. The complete system architecture
+3. Where AI creates real value, and where it creates risk
+4. What actually ships in two weeks"
+
+[Pause 2 seconds]
 
 ===============================================================================
-SLIDES 2-3: ASSUMPTIONS
+SLIDE 2: ASSUMPTIONS (PART 1)
 ===============================================================================
-"Critical assumptions that shaped everything:
-- Target best 50k→5k buildings, not all
-- Day-old data acceptable (enables caching)
-- < 5 min latency, < €1.50 cost
-- Users are busy sales engineers (no hallucinated numbers)
-- HubSpot CRM API accessible
-- Building data pre-indexed in PostGIS"
+[Methodical, establish reasoning]
+
+"Before any architecture, I had to clarify critical assumptions:
+
+First: Are we targeting all 50,000 buildings in a municipality, or just the best ones?
+→ I assumed: focus on high-ROI targets only. Buildings with roof area > 200 m².
+   Why? It filters 50k down to 5k immediately. That's the difference between
+   'computable in minutes' and 'computable in 8+ hours.'
+
+Second: How fresh does the solar data need to be?
+→ I assumed: day-old data is acceptable.
+   Why? Enables caching. Second query on the same municipality is instant.
+
+Third: What's the max latency and budget per briefing?
+→ I assumed: under 5 minutes is acceptable, under €1.50 is the cost target.
+   Why? This drives the entire pre-filter-first strategy."
+
+[Pause]
 
 ===============================================================================
-SLIDE 4: PRODUCTION ARCHITECTURE (Overview)
+SLIDE 3: ASSUMPTIONS (PART 2)
 ===============================================================================
-"The system runs on AWS:
-Client → React Frontend → AWS ALB → Node.js API → [PostgreSQL, PostGIS, Redis, S3] ↔ [Google Solar, HubSpot]"
+[Building on assumptions]
+
+"Three more critical assumptions:
+
+Fourth: Who is the primary user?
+→ I assumed: sales engineers. They're busy. They need speed AND accuracy.
+   Why? This means: never let AI invent financial numbers. Credibility is
+   everything for a sales tool.
+
+Fifth: Is the CRM data accessible via API?
+→ I assumed: yes, HubSpot API.
+   Why? Enables joining briefings to active deals by fuzzy address matching.
+
+Sixth: Is building geometry data pre-indexed?
+→ I assumed: yes, in a PostGIS database.
+   Why? Raw GeoJSON parsing would be slow. Pre-indexed = fast."
+
+[Pause]
+
+===============================================================================
+SLIDE 4: PRODUCTION ARCHITECTURE
+===============================================================================
+[Show visual calm confidence]
+
+"Here's what the system looks like at 10,000 feet:
+
+[Point to the slide]
+
+Client hits a React frontend. Frontend sends the municipality name to an
+API server running on AWS. The API orchestrates everything:
+
+Top layer: Geocoding service, pre-filter logic, solar calculations
+Middle layer: PostgreSQL with PostGIS for building data, Redis for caching
+External integrations: Google Solar API for roof-level PV potential,
+HubSpot for CRM context
+
+All of this is designed around ONE principle: reduce expensive API calls
+by 99% through intelligent pre-filtering."
+
+[Pause]
 
 ===============================================================================
 SLIDE 5: COMPONENT DIAGRAM (UML)
 ===============================================================================
-"Shows EVERY component and relationships:
-Sales Engineer → React Frontend → AWS ALB → Node.js API
+[Point to the diagram, explain relationships]
 
-API connects to:
-├─ Geocoding Service
-├─ Pre-Filter Service
-├─ Solar Calculator
-├─ PV Math Engine
-├─ LLM Service
-└─ Storage: [PostgreSQL, PostGIS, Redis, S3, HubSpot API, Google Solar API]"
+"Now let's look at the components more precisely. This is a UML component diagram.
+
+[Trace your finger through the diagram]
+
+On the left: the user, our sales engineer. They interact with the React frontend.
+
+The frontend is stateless—it just sends requests to the API server.
+
+The API server is the orchestrator. It connects to six key services:
+- Geocoder: turns 'Kirchheim' into coordinates and an AGS code
+- Pre-Filter: queries PostGIS for buildings matching our criteria
+- Solar API: calls Google for PV potential (only for top 50)
+- PV Math: deterministic calculations (no AI)
+- LLM Service: generates the narrative summary
+- Data layer: PostGIS, Redis, S3 for storage and caching
+
+Every arrow here is either a request or a data flow.
+The diagram shows: how coupled or decoupled is each service?
+
+Notice: the API is tightly coupled to the data layer but loosely coupled
+to external services (via abstraction). That's intentional."
+
+[Pause]
 
 ===============================================================================
 SLIDE 6: DEPLOYMENT DIAGRAM (UML)
 ===============================================================================
-"WHERE everything runs in production AWS:
-User → CloudFront CDN → AWS ALB → ECS Fargate (3+ instances)
+[Point to layers, explain redundancy]
 
-Data Layer (all AWS):
-├─ RDS PostgreSQL Multi-AZ
-├─ PostGIS 3dcityDB
-├─ ElastiCache Redis Cluster
-└─ S3 Bucket
+"This is WHERE everything runs in production. Also a UML diagram.
 
-External:
-├─ Google Solar API
-└─ HubSpot CRM API
+[Trace from top to bottom]
 
-Everything encrypted, redundant, auto-scaling."
+Top layer: users hit CloudFront—a CDN. Caches HTML, CSS, JS assets globally.
+
+Below that: AWS ALB—an application load balancer. Routes traffic.
+
+Core: three ECS Fargate instances running the API. Why three?
+Redundancy. One goes down, traffic routes to the other two. Auto-scales if needed.
+
+Data layer—all in AWS, all multi-AZ (across availability zones):
+- RDS PostgreSQL for relational data (buildings, addresses)
+- PostGIS extension for spatial queries
+- ElastiCache Redis for geocoding and solar result caching
+- S3 for briefing archives
+
+External APIs: Google Solar API and HubSpot CRM. We don't own these,
+but we design around failures (circuit breaker pattern).
+
+Everything is encrypted (TLS 1.3 in transit, AWS KMS at rest),
+monitored (CloudWatch), and auditable (logs on everything)."
+
+[Pause]
 
 ===============================================================================
 SLIDE 7: SEQUENCE DIAGRAM (UML) - 7-STEP WORKFLOW
 ===============================================================================
-"Exact flow when user searches 'Kirchheim':
+[Walk through step-by-step, counting on fingers]
 
-1. User searches → Frontend sends request
-2. API calls Geocoding (500ms, cached)
-3. API Pre-Filter: 50k→5k buildings (800ms)
-4. API calls Google Solar API for top 50 only (1-2 min) ← longest
-5. API runs PV Math (100ms, deterministic)
-6. API joins HubSpot CRM data (200ms)
-7. API calls LLM for narrative (2-3 sec)
-→ Return Briefing JSON (2-3 minutes total)"
+"Now the most important diagram: the sequence. What actually happens
+when a sales engineer types 'Kirchheim' and hits search?
 
-===============================================================================
-SLIDES 8-14: DESIGN DECISIONS & TRADE-OFFS
-===============================================================================
+[Trace through the diagram left to right, top to bottom]
 
-DESIGN DECISION #1: Municipality Lookup
-"Option A: Exact string match (fast but fragile)
-Option B: Geocoding + fuzzy matching ✓ (robust, handles typos, TTL cache)"
+Step 1: User searches. Request hits the API.
 
-DESIGN DECISION #2: PV Computation
-"Option A: Call Google API for all 50k buildings = €1,500 + 8 hours ❌
-Option B: Pre-filter to 50, call Google only for winners = €1.50 + 2-3 min ✓"
+Step 2: API calls the geocoder.
+→ 'Kirchheim' + fuzzy matching → AGS code (German municipality ID) + bounding box
+→ Cached result. First time: 500ms. Second time: instant.
 
-DESIGN DECISION #3: Where AI Fits
-"✓ AI: Address fuzzy matching (NLP)
-✓ AI: Writing narratives (LLM)
-❌ AI: Financial calculations (LLMs hallucinate numbers, risk is too high)
-Solution: AI writes text only, all numbers from deterministic code"
+Step 3: API pre-filters buildings.
+→ Query PostGIS: all buildings in the bbox
+→ Filter to roof area > 200 m²
+→ Sort by size (biggest first, highest ROI)
+→ Result: 5,000 buildings → 800ms
 
-DESIGN DECISION #4: CRM Join
-"❌ Option A: Exact address match (brittle)
-✓ Option B: Fuzzy NLP + coordinate proximity (robust)"
+Step 4: API calls Google Solar API.
+→ Only for the top 50 buildings (not 5,000, not 50,000)
+→ Returns: kWh/year potential, irradiance, equipment efficiency
+→ This is the slowest step: 1-2 minutes
 
-V1 SHIP STRATEGY (2 Weeks):
-"CUT: Full pre-computation (do on-demand instead)
-CUT: Bi-directional CRM sync (read-only for now)
-CUT: AI agent loops (single LLM call, simple)
-KEEP: Core insight (pre-filter → selective API calls)
+Step 5: API runs PV math.
+→ Deterministic formulas: kWp = roof_area × insolation × module_efficiency
+→ Payback period = capex ÷ annual_savings
+→ All numbers from code, never from AI
+→ Fast: 100ms
 
-If this saves sales engineers 3 hours per municipality, we have product-market fit."
+Step 6: API joins HubSpot CRM data.
+→ Fuzzy address match: link buildings to existing deals
+→ Attach deal status, contact info, last interaction date
+→ 200ms
 
-===============================================================================
-SLIDE 15: SECURITY & RISK
-===============================================================================
-"Production safeguards:
-- OAuth2 authentication (HubSpot login)
-- TLS 1.3 encryption (data in transit)
-- AWS KMS encryption (data at rest)
-- Rate limiting (1000 req/min per user)
-- Circuit breaker (graceful degradation if APIs fail)
+Step 7: API calls LLM.
+→ Generates narrative: 'Kirchheim has X buildings, Y MWp potential,
+  Z CO₂ offset. Strong irradiance. Recommend starting with Rathaus.'
+→ Text only. Numbers already injected from step 5.
+→ 2-3 seconds
 
-AI risk mitigation:
-- Pydantic schemas validate every output
-- No AI-generated numbers (only text)
+Total: 2-3 minutes. Cost: €1.50 (50 calls × €0.03 per call).
 
-Compliance:
-- GDPR: 24-month data retention
-- Audit logs: Every API call recorded
-- SOC2 ready: CloudWatch + Datadog monitoring"
+[Pause]
+
+That's the flow. Every step is optimized for speed and cost."
 
 ===============================================================================
-SLIDE 16: SUMMARY - THE CORE INSIGHT
+SLIDE 8: REQUEST WORKFLOW (DETAILED TIMELINE)
 ===============================================================================
-"You can't compute 50,000 buildings in 2 minutes.
+[Detailed, methodical]
 
-But you CAN:
-1. Pre-filter to 5,000 via static geometry (fast)
-2. Rank by roof size (highest ROI first)
-3. Call expensive API only for top 50
+"Let me break down the timing in more detail.
+
+[Point to each timeline item]
+
+Geocoding (500ms cached): This is fast because OpenStreetMap's fuzzy matching
+is highly optimized. We cache the result aggressively (TTL: 7 days).
+Why? 'Kirchheim' will be searched again.
+
+Pre-filter (800ms): PostGIS spatial queries are fast. We're not doing
+geometric calculations—just filtering by a simple bbox and a numeric threshold.
+
+Solar API (1-2 min): This is where most time goes. We're calling Google's API
+50 times in parallel. Network I/O dominates here.
+
+PV Math (100ms): Deterministic. Python code, vectorized with NumPy.
+
+CRM Join (200ms): Database lookup + fuzzy string matching. Fast.
+
+LLM Narrative (2-3s): Network request to Claude API. Depends on token count.
+
+Total: 2-3 minutes, mostly blocked on Step 4 (Google Solar API).
+
+Key insight: You cannot parallelize Step 4 further without hitting rate limits.
+But you CAN optimize everything else."
+
+===============================================================================
+SLIDE 9: DESIGN DECISION #1 - MUNICIPALITY LOOKUP
+===============================================================================
+[Pros and cons approach]
+
+"First design decision: how do we turn a typo-prone user input
+('Kirchheim' or 'Kirchheim-unter-Teck' or 'KH') into a valid municipality?
+
+Option A: Exact string match in the database.
+→ Fast. But brittle.
+→ Fails on 'Kirchheim unter Teck' vs 'Kirchheim-unter-Teck'
+→ Fails on abbreviations: 'KH'
+→ Sales engineer has to spell it right. Not good.
+
+Option B: Geocoding + fuzzy matching + caching
+→ Call OpenStreetMap's geocoder with fuzzy matching
+→ Returns official municipality bounds (bbox) + AGS code
+→ Cache the result (TTL: 7 days)
+→ First query: 500-800ms. Repeat queries: instant.
+→ Handles typos, abbreviations, spacing.
+
+I chose Option B.
+
+Why? Because robustness matters. A sales engineer types 'Kircheim' (typo).
+Option A: 'not found, try again'. Option B: 'did you mean Kirchheim?'
+Plus, caching eliminates latency on repeat searches."
+
+===============================================================================
+SLIDE 10: DESIGN DECISION #2 - PV COMPUTATION STRATEGY
+===============================================================================
+[Dramatic contrast]
+
+"Second decision: how many buildings do we compute PV for?
+
+Naive Approach: compute all 50,000 buildings in a municipality.
+50,000 buildings × €0.03 per Google API call = €1,500 per briefing.
+50,000 ÷ 100 calls per minute = 500 minutes = 8+ hours per briefing.
+Unacceptable.
+
+Smart Approach: pre-filter to 5,000, compute only the top 50.
+Filter by roof geometry (static data): 50k → 5k.
+Rank by roof size.
+Call Google Solar API for top 50 only.
+Cost: 50 calls × €0.03 = €1.50.
+Time: 1-2 minutes.
+100x cost savings. 200x time savings.
+
+I chose the smart approach.
+
+The insight: a sales engineer cares about the best 10 buildings, not all 50,000.
+Building geometry doesn't change. So pre-filtering is fast and cheap.
+Call expensive APIs only for winners."
+
+===============================================================================
+SLIDE 11: DESIGN DECISION #3 - WHERE AI FITS
+===============================================================================
+[Safety-focused]
+
+"Third decision: where does AI actually create value? And where does it
+create risk?
+
+AI is GOOD for:
+→ Fuzzy address matching. Match 'Rathaus, Kirchheim' (briefing) against
+  'Town Hall, Kirchheim' (CRM). NLP beats regex.
+→ Narrative generation. Write a contextual summary: 'Strong irradiance +
+  existing relationship. Recommend starting with Rathaus as anchor.'
+  LLMs excel at this.
+
+AI is BAD for:
+→ Financial calculations. Never. LLMs hallucinate numbers.
+  I saw a case where an AI invented 500 kWp capacity (off by 2x).
+  That kills credibility with a sales team.
+
+Risk mitigation: AI writes text only. All numbers come from deterministic code.
+Pydantic schemas validate every output field before it leaves the API.
+
+I chose: AI for text, code for numbers."
+
+===============================================================================
+SLIDE 12: DESIGN DECISION #4 - CRM DATA JOIN
+===============================================================================
+[Problem-solving]
+
+"Fourth decision: how do we link buildings in the briefing to active deals
+in the CRM?
+
+The challenge: there's no common key. A briefing has 'Hauptstraße 12, Kirchheim'.
+HubSpot might have 'Hauptstr. 12' or 'Main Street 12'.
+
+Option A: exact address match
+→ Brittle. Abbreviations, spacing, language variations all fail.
+
+Option B: fuzzy address match + coordinate proximity
+→ Use NLP to compare addresses (handles variations, typos)
+→ Also compare lat/lon (catches name variations)
+→ Link to HubSpot deal metadata
+
+I chose Option B.
+
+Output: the briefing includes deal context.
+'2 active deals · Last contact: 3 weeks ago · Key contact: Hans Müller'
+
+Suddenly the sales engineer has full context. Not just solar data—context."
+
+===============================================================================
+SLIDE 13: V1 TRADE-OFFS - WHAT TO CUT
+===============================================================================
+[Strategic prioritization]
+
+"Now, what ships in two weeks? V1 is lean.
+
+We CUT: Full city pre-computation
+V1 strategy: compute on-demand (2-3 minutes)
+V2 strategy: pre-compute solar data at night, serve from cache (instant)
+Why cut it? V1 proves the value faster. We can't pre-compute all 16,000
+German municipalities in advance.
+
+We CUT: Bi-directional CRM sync
+V1: read-only CRM data (we fetch deals, but don't push anything back)
+V2: write solar scores back to HubSpot
+Why cut it? Simpler, lower risk. Avoids accidentally overwriting CRM data.
+
+We CUT: Multi-step AI agent
+V1: one LLM call, one narrative
+V2: agentic loop with brainstorming steps
+Why cut it? Simple is better. One call is cheaper and less error-prone.
+
+We KEEP: The core insight
+Pre-filter 50k → 5k. Call expensive APIs for top 50 only.
+Deterministic math. LLM narrative. That's it.
+
+If this saves a sales engineer 3 hours per municipality, we have product-market fit.
+Everything else is iteration."
+
+===============================================================================
+SLIDE 14: SYSTEM SUMMARY (OPTIONAL - VARIES BY DELIVERY)
+===============================================================================
+[Fast recap or skip if running long]
+
+"Everything flows from one principle:
+
+You cannot compute PV for 50,000 buildings in minutes.
+
+But you CAN do this:
+1. Pre-filter 50k buildings to 5k via static geometry
+2. Rank by roof size (biggest = highest ROI)
+3. Call Google Solar API only for top 50
 4. Join with CRM data via fuzzy matching
-5. Generate narrative with LLM (text only)
+5. Generate narrative with LLM (deterministic numbers only)
 
-Result: 2-3 minutes, €1.50 cost, sales-ready briefing
+Result: 2-3 minutes, €1.50 cost, sales-ready briefing.
 
-Every design decision traces back to this insight."
+This is the design. Every decision traces back to an assumption or a constraint."
 
 ===============================================================================
-SLIDE 17: LIVE DEMO
+SLIDE 15: SECURITY & RISK MITIGATION
 ===============================================================================
-"Click the button to launch the React prototype.
-This shows the UX. The architecture above is the foundation."
+[Confidence, thoroughness]
+
+"Production safeguards and compliance:
+
+Authentication: OAuth2 for HubSpot login. Users can't access the system
+without valid HubSpot credentials.
+
+Encryption: TLS 1.3 in transit. AWS KMS at rest. All data encrypted.
+
+Rate limiting: 1,000 requests per minute per user. Prevents abuse.
+
+AI Safety: Pydantic schemas validate every output. If a field is unexpected,
+the request fails before it reaches the user.
+→ AI writes text only. All financial numbers are from verified code.
+→ Circuit breaker pattern: if Google Solar API fails, we return a
+  graceful error instead of crashing.
+
+GDPR Compliance: 24-month data retention policy. After 24 months,
+municipal data is deleted.
+
+Audit Logging: Every API call is logged. We can answer:
+'Who queried Kirchheim, when, and what did they do with it?'
+
+SOC2 ready: CloudWatch logs everything. Datadog monitors uptime and latency.
+
+Core principle: Never let AI generate financial numbers.
+Validation happens at every layer. Auditability is built in."
+
+===============================================================================
+SLIDE 16: THE CORE ARCHITECTURAL INSIGHT
+===============================================================================
+[Confident, measured]
+
+"Let me circle back to the big picture.
+
+The problem is real: sales engineers spend 8+ hours researching municipalities.
+
+The naive solution is expensive: call Google Solar API for all 50,000 buildings
+= €1,500, 8+ hours.
+
+The insight: building geometry is static. We can pre-filter for free.
+
+So we:
+- Pre-filter 50k → 5k (static geometry, fast)
+- Rank by roof area
+- Call expensive APIs for top 50 only
+- Join CRM context via fuzzy matching
+- Generate narrative with AI (text only)
+
+Result: 2-3 minutes, €1.50.
+
+Every design decision—assumptions, component diagrams, deployment, sequence flow—
+traces back to this insight.
+
+If we can deploy this and save a sales engineer 3 hours per municipality,
+we have product-market fit. Everything after that is scaling and refinement."
+
+[Pause]
+
+"Questions on the architecture, the decisions, or the trade-offs?"
+
+===============================================================================
+SLIDE 17: LIVE DEMONSTRATION
+===============================================================================
+[Casual, inviting]
+
+"Click 'Launch Interactive UI' to see the prototype.
+
+This is the user experience. The architecture above is the foundation.
+
+[After clicking, the dev server starts and opens localhost:5173]
+
+[Walk through the prototype UI, show:
+- Search input for municipality name
+- Solar results display (top buildings, kWh/year)
+- Financial metrics (capex, payback period, CO₂ offset)
+- CRM context (active deals, contacts)
+- Summary narrative
+- PDF export option (if implemented)]
+
+This is V1. Simple, focused, solves the core problem."
 
 ===============================================================================
 KEY PRESENTATION TIPS
 ===============================================================================
-- Speak naturally, don't read the script
-- Pause after each key decision (let them absorb)
-- Show confidence in your choices
-- When they ask questions, answer without apologizing
-- UML diagrams matter more than words — point to components
-- Emphasize trade-offs: "We cut X to ship faster because Y"
-- Close with: "Questions on the architecture, the decisions, or the trade-offs?"
+
+1. Speak naturally, don't read the script
+   - Glance at the notes, then look at the audience
+   - Pause after each major point (2-3 seconds)
+   - If you stumble, keep going. No apologies.
+
+2. Pace matters
+   - Assumptions (2-3 min)
+   - Architecture overview + diagrams (5-6 min)
+   - Design decisions (6-8 min)
+   - Trade-offs and summary (2-3 min)
+   - Demo (2-3 min)
+   - Q&A (2-3 min)
+   - Total: 18-22 minutes
+
+3. Emphasize trade-offs constantly
+   - "We CUT X to ship faster because Y"
+   - "Option A is faster but brittle. Option B is robust but slightly slower. We chose B because..."
+
+4. Point to diagrams
+   - Don't just read the slide
+   - Use your hand to trace flows in the sequence diagram
+   - Explain: "This arrow means the API calls the geocoder"
+
+5. Confidence
+   - You made thoughtful decisions
+   - You have reasons for everything
+   - If they ask hard questions, answer without apologizing
+   - "That's a good question. Here's why we made that trade-off..."
+
+6. Close with the core insight
+   - Remind them: pre-filter + selective APIs = 99% cost savings
+   - "Questions on the architecture, decisions, or trade-offs?"
+
+===============================================================================
