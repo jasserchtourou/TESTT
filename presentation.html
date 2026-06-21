@@ -18,7 +18,6 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
 .slide-body{flex:1;display:flex;flex-direction:column;padding:36px 60px 28px;overflow:auto}
 .slide-title{font-size:36px;font-weight:800;line-height:1.15;background:linear-gradient(135deg,var(--white) 40%,var(--blue2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
 .slide-subtitle{font-size:15px;color:var(--gray);font-weight:400;margin-bottom:24px}
-.mermaid{display:flex;justify-content:center;align-items:center;font-size:12px !important}
 .nav{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:12px;z-index:100;align-items:center}
 .nav button{background:rgba(30,144,255,0.15);border:1px solid var(--blue);color:var(--white);padding:10px 24px;border-radius:30px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
 .nav button:hover{background:var(--blue)}
@@ -39,41 +38,23 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
 .decision-card .dec-text{font-size:13px;color:var(--light);line-height:1.6}
 .highlight-box{background:rgba(30,144,255,0.08);border:1px solid rgba(30,144,255,0.3);border-radius:12px;padding:16px 20px}
 .highlight-box p{font-size:13px;color:var(--light);line-height:1.7}
-.two-col{display:flex;gap:32px;flex:1}
-.col{flex:1;display:flex;flex-direction:column;gap:14px}
-.bullets-compact{list-style:none;display:flex;flex-direction:column;gap:10px}
-.bullets-compact li{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--light);line-height:1.5}
-.bullets-compact li .dot-b{width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:6px}
-.cta-btn{display:inline-block;background:linear-gradient(135deg,var(--blue),var(--accent));color:#0D1B2A;padding:16px 40px;border-radius:40px;font-family:'Inter',sans-serif;font-size:16px;font-weight:700;text-decoration:none;transition:all .25s;letter-spacing:.5px;cursor:pointer;border:none}
-.cta-btn:hover{transform:scale(1.05);box-shadow:0 0 30px rgba(30,144,255,0.4)}
-
-/* Architecture diagram styles */
-.arch-container{flex:1;display:flex;flex-direction:column;justify-content:center;gap:20px;font-size:13px}
-.arch-layer{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:12px}
-.layer-title{font-size:12px;font-weight:700;color:var(--blue2);text-transform:uppercase;margin-bottom:12px;letter-spacing:1px}
-.layer-content{display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap}
-.component{background:rgba(30,144,255,0.1);border:1px solid rgba(30,144,255,0.4);border-radius:8px;padding:12px 16px;flex:1;min-width:140px;text-align:center}
-.component .comp-name{font-weight:700;color:var(--blue2);margin-bottom:4px}
-.component .comp-desc{font-size:11px;color:var(--gray)}
-.component.critical{background:rgba(0,242,254,0.08);border-color:rgba(0,242,254,0.4)}
-.component.critical .comp-name{color:var(--accent)}
-.data-flow{display:flex;align-items:center;justify-content:space-between;padding:16px 0;background:rgba(30,144,255,0.04);border-radius:8px;padding:16px}
-.data-flow .step{flex:1;text-align:center}
-.data-flow .step-num{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:4px}
-.data-flow .step-text{font-size:12px;color:var(--light)}
-.data-flow .arrow{color:var(--blue2);font-size:20px;padding:0 8px}
+.diagram-container{flex:1;display:flex;justify-content:center;align-items:center;width:100%;overflow:auto}
+.arch-box{background:rgba(30,144,255,0.1);border:2px solid rgba(30,144,255,0.4);border-radius:8px;padding:12px 16px;text-align:center;font-size:12px;color:var(--light);font-weight:600}
+.arch-box.critical{background:rgba(0,242,254,0.1);border-color:rgba(0,242,254,0.6);color:var(--accent)}
+.arch-arrow{color:var(--blue2);font-size:18px;margin:0 8px}
 .timeline-item{background:var(--card);border-left:3px solid var(--blue);padding:12px 16px;margin-bottom:10px;border-radius:4px}
 .timeline-item .time{font-size:11px;color:var(--accent);font-weight:700;margin-bottom:4px}
 .timeline-item .desc{font-size:13px;color:var(--light)}
+.cta-btn{display:inline-block;background:linear-gradient(135deg,var(--blue),var(--accent));color:#0D1B2A;padding:16px 40px;border-radius:40px;font-family:'Inter',sans-serif;font-size:16px;font-weight:700;text-decoration:none;transition:all .25s;letter-spacing:.5px;cursor:pointer;border:none}
+.cta-btn:hover{transform:scale(1.05);box-shadow:0 0 30px rgba(30,144,255,0.4)}
+svg{max-width:100%;height:auto}
 </style>
 </head>
 <body>
-<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-<script>mermaid.initialize({startOnLoad:true,theme:'dark',securityLevel:'loose',diagram:{useMaxWidth:true},flowchart:{curve:'linear'}});</script>
 <div class="key-hint">Arrow keys to navigate</div>
 <div class="deck" id="deck">
 
-<!-- SLIDE 1 — Title -->
+<!-- SLIDE 1: TITLE -->
 <div class="slide active" id="slide-1">
   <div class="grid-bg"></div>
   <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">01 / 17</span></div>
@@ -90,26 +71,23 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
   </div>
 </div>
 
-<!-- SLIDE 2 — Assumptions (Part 1) -->
+<!-- SLIDE 2: ASSUMPTIONS (Part 1) -->
 <div class="slide" id="slide-2">
   <div class="grid-bg"></div>
   <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">02 / 17</span></div>
   <div class="slide-body">
     <div class="slide-title">Clarifying Assumptions</div>
     <div class="slide-subtitle">Critical questions that shaped the architecture</div>
-
     <div class="assumption-item">
       <div class="assume-q">❓ "Are we targeting all 50,000 buildings, or the best ones?"</div>
       <div class="assume-a"><strong>I assumed:</strong> Focus on high-ROI targets (roof area > 200 m²).</div>
       <div class="assume-why">Why: Filters 50k buildings → 5k qualifying → 50 API calls. Reduces cost by 99%.</div>
     </div>
-
     <div class="assumption-item">
       <div class="assume-q">❓ "How fresh does the solar data need to be?"</div>
       <div class="assume-a"><strong>I assumed:</strong> Daily-stale data is acceptable.</div>
       <div class="assume-why">Why: Enables caching → sub-second response on repeat queries.</div>
     </div>
-
     <div class="assumption-item">
       <div class="assume-q">❓ "What's the max latency and budget per briefing?"</div>
       <div class="assume-a"><strong>I assumed:</strong> < 5 minutes, < €1.50 per call.</div>
@@ -118,26 +96,23 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
   </div>
 </div>
 
-<!-- SLIDE 3 — Assumptions (Part 2) -->
+<!-- SLIDE 3: ASSUMPTIONS (Part 2) -->
 <div class="slide" id="slide-3">
   <div class="grid-bg"></div>
   <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">03 / 17</span></div>
   <div class="slide-body">
     <div class="slide-title">More Clarifying Assumptions</div>
     <div class="slide-subtitle">Additional constraints that shaped design decisions</div>
-
     <div class="assumption-item">
       <div class="assume-q">❓ "Who is the primary user?"</div>
       <div class="assume-a"><strong>I assumed:</strong> Sales engineers. They're busy. Speed and accuracy matter.</div>
       <div class="assume-why">Why: Shapes UX and drives decision: never let AI invent financial numbers.</div>
     </div>
-
     <div class="assumption-item">
       <div class="assume-q">❓ "Is the CRM data accessible via API?"</div>
       <div class="assume-a"><strong>I assumed:</strong> HubSpot API access exists.</div>
       <div class="assume-why">Why: Enables joining briefings to active deals by fuzzy address matching.</div>
     </div>
-
     <div class="assumption-item">
       <div class="assume-q">❓ "Is building geometry data pre-indexed?"</div>
       <div class="assume-a"><strong>I assumed:</strong> Yes, in a PostGIS database.</div>
@@ -146,379 +121,414 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
   </div>
 </div>
 
-<!-- SLIDE 4 — System Architecture -->
+<!-- SLIDE 4: PRODUCTION ARCHITECTURE OVERVIEW -->
 <div class="slide" id="slide-4">
   <div class="grid-bg"></div>
   <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">04 / 17</span></div>
   <div class="slide-body">
-    <div class="slide-title">System Architecture</div>
+    <div class="slide-title">System Architecture (Overview)</div>
     <div class="slide-subtitle">Complete stack: from user input to briefing output</div>
-
-    <div class="arch-container">
-      <!-- Presentation Layer -->
-      <div class="arch-layer">
-        <div class="layer-title">📱 Presentation Layer</div>
-        <div class="layer-content">
-          <div class="component">
-            <div class="comp-name">React Frontend</div>
-            <div class="comp-desc">Search form, briefing display, PDF export</div>
-          </div>
-        </div>
+    <div class="diagram-container" style="gap:12px">
+      <div style="text-align:center">
+        <div class="arch-box" style="min-width:120px">📱 React Frontend</div>
       </div>
-
-      <!-- API & Cache Layer -->
-      <div class="arch-layer">
-        <div class="layer-title">🔧 Orchestration & Cache Layer</div>
-        <div class="layer-content">
-          <div class="component critical">
-            <div class="comp-name">API Server</div>
-            <div class="comp-desc">Node.js/Express orchestrator</div>
-          </div>
-          <div class="component">
-            <div class="comp-name">Redis Cache</div>
-            <div class="comp-desc">Geocoding, solar results, CRM joins</div>
-          </div>
-        </div>
+      <div class="arch-arrow">→</div>
+      <div style="text-align:center">
+        <div class="arch-box critical" style="min-width:120px">🔧 API Server</div>
       </div>
-
-      <!-- Data Sources -->
-      <div class="arch-layer">
-        <div class="layer-title">🗄️ Data Sources & External Services</div>
-        <div class="layer-content">
-          <div class="component">
-            <div class="comp-name">Geocoder</div>
-            <div class="comp-desc">OSM API → coordinates</div>
-          </div>
-          <div class="component critical">
-            <div class="comp-name">3dcityDB</div>
-            <div class="comp-desc">PostGIS indexed buildings</div>
-          </div>
-          <div class="component">
-            <div class="comp-name">Google Solar API</div>
-            <div class="comp-desc">PV potential for roofs</div>
-          </div>
-          <div class="component">
-            <div class="comp-name">HubSpot CRM</div>
-            <div class="comp-desc">Deals & contact data</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Processing -->
-      <div class="arch-layer">
-        <div class="layer-title">⚙️ Processing & Output</div>
-        <div class="layer-content">
-          <div class="component">
-            <div class="comp-name">PV Calculator</div>
-            <div class="comp-desc">Deterministic math</div>
-          </div>
-          <div class="component">
-            <div class="comp-name">LLM Engine</div>
-            <div class="comp-desc">Narrative only</div>
-          </div>
-          <div class="component critical">
-            <div class="comp-name">Briefing JSON</div>
-            <div class="comp-desc">Structured output</div>
-          </div>
-        </div>
+      <div class="arch-arrow">→</div>
+      <div style="text-align:center">
+        <div class="arch-box" style="min-width:140px">🗄️ PostgreSQL<br>PostGIS</div>
       </div>
     </div>
-
-    <div class="highlight-box" style="margin-top:12px">
-      <p><strong>Key Principle:</strong> Reduce expensive API calls by 99% through intelligent pre-filtering of static data. Only call expensive APIs for top candidates.</p>
+    <div class="diagram-container" style="gap:12px;margin-top:20px">
+      <div style="text-align:center">
+        <div class="arch-box" style="min-width:120px">☁️ AWS<br>Fargate</div>
+      </div>
+      <div class="arch-arrow">↔</div>
+      <div style="text-align:center">
+        <div class="arch-box" style="min-width:120px">💾 Redis<br>Cache</div>
+      </div>
+      <div class="arch-arrow">↔</div>
+      <div style="text-align:center">
+        <div class="arch-box" style="min-width:120px">🔗 External<br>APIs</div>
+      </div>
+    </div>
+    <div class="highlight-box" style="margin-top:16px">
+      <p><strong>Key Principle:</strong> Reduce expensive API calls by 99% through intelligent pre-filtering of static data. Only compute winners.</p>
     </div>
   </div>
 </div>
 
-<!-- SLIDE 5 — Component Diagram -->
+<!-- SLIDE 5: COMPONENT DIAGRAM -->
 <div class="slide" id="slide-5">
   <div class="grid-bg"></div>
   <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">05 / 17</span></div>
   <div class="slide-body">
-    <div class="slide-title">Component Diagram (UML)</div>
+    <div class="slide-title">Component Diagram</div>
     <div class="slide-subtitle">System components and their relationships</div>
-    <div class="mermaid">
-      graph LR
-        User["👤 Sales Engineer"]
-        React["⚛️ React Frontend"]
-        API["🔧 API Server"]
-        Geocoder["🗺️ Geocoder"]
-        PreFilter["🔍 Pre-Filter"]
-        Solar["☀️ Solar API"]
-        PV["⚙️ PV Math"]
-        LLM["🤖 LLM"]
-        DB["🗄️ PostGIS DB"]
-        Redis["💾 Redis Cache"]
-        CRM["📊 HubSpot CRM"]
-        Output["📋 Briefing JSON"]
+    <div class="diagram-container">
+      <svg viewBox="0 0 1200 600" style="max-width:100%;height:100%">
+        <defs>
+          <style>
+            .comp-box { fill: rgba(30,144,255,0.1); stroke: rgba(30,144,255,0.6); stroke-width: 2; }
+            .comp-critical { fill: rgba(0,242,254,0.1); stroke: rgba(0,242,254,0.8); }
+            .comp-text { font-family: Inter, sans-serif; font-size: 12px; fill: #FFF; font-weight: 600; text-anchor: middle; }
+            .comp-arrow { stroke: rgba(30,144,255,0.6); stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+            .comp-label { font-family: Inter, sans-serif; font-size: 11px; fill: #A8B2C1; }
+          </style>
+          <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+            <polygon points="0 0, 10 3, 0 6" fill="rgba(30,144,255,0.8)" />
+          </marker>
+        </defs>
 
-        User --> React
-        React --> API
-        API --> Geocoder
-        API --> PreFilter
-        API --> Solar
-        API --> PV
-        API --> LLM
-        Geocoder --> Redis
-        PreFilter --> DB
-        Solar --> Redis
-        PV --> Output
-        LLM --> Output
-        API --> CRM
-        API --> Output
+        <!-- User -->
+        <rect x="50" y="250" width="100" height="60" rx="4" class="comp-box" />
+        <text x="100" y="285" class="comp-text">👤 User</text>
+
+        <!-- React Frontend -->
+        <rect x="200" y="250" width="120" height="60" rx="4" class="comp-box" />
+        <text x="260" y="285" class="comp-text">⚛️ React</text>
+
+        <!-- API Server (critical) -->
+        <rect x="400" y="250" width="120" height="60" rx="4" class="comp-box comp-critical" />
+        <text x="460" y="285" class="comp-text">🔧 API Server</text>
+
+        <!-- Services -->
+        <rect x="200" y="100" width="110" height="50" rx="4" class="comp-box" />
+        <text x="255" y="130" class="comp-text">🗺️ Geocoder</text>
+
+        <rect x="330" y="100" width="110" height="50" rx="4" class="comp-box" />
+        <text x="385" y="130" class="comp-text">🔍 Pre-Filter</text>
+
+        <rect x="460" y="100" width="110" height="50" rx="4" class="comp-box" />
+        <text x="515" y="130" class="comp-text">☀️ Solar API</text>
+
+        <rect x="590" y="100" width="110" height="50" rx="4" class="comp-box" />
+        <text x="645" y="130" class="comp-text">⚙️ PV Math</text>
+
+        <rect x="720" y="100" width="110" height="50" rx="4" class="comp-box" />
+        <text x="775" y="130" class="comp-text">🤖 LLM</text>
+
+        <!-- Data Layer -->
+        <rect x="200" y="400" width="110" height="50" rx="4" class="comp-box" />
+        <text x="255" y="430" class="comp-text">🗄️ PostGIS</text>
+
+        <rect x="330" y="400" width="110" height="50" rx="4" class="comp-box" />
+        <text x="385" y="430" class="comp-text">💾 Redis</text>
+
+        <rect x="460" y="400" width="110" height="50" rx="4" class="comp-box" />
+        <text x="515" y="430" class="comp-text">📊 HubSpot</text>
+
+        <rect x="590" y="400" width="110" height="50" rx="4" class="comp-box" />
+        <text x="645" y="430" class="comp-text">📋 Output JSON</text>
+
+        <!-- Arrows -->
+        <path d="M 150 280 L 200 280" class="comp-arrow" />
+        <path d="M 320 280 L 400 280" class="comp-arrow" />
+
+        <!-- API to Services -->
+        <path d="M 460 250 L 255 150" class="comp-arrow" />
+        <path d="M 460 250 L 385 150" class="comp-arrow" />
+        <path d="M 460 250 L 515 150" class="comp-arrow" />
+        <path d="M 460 250 L 645 150" class="comp-arrow" />
+        <path d="M 460 250 L 775 150" class="comp-arrow" />
+
+        <!-- API to Data -->
+        <path d="M 420 310 L 255 400" class="comp-arrow" />
+        <path d="M 450 310 L 385 400" class="comp-arrow" />
+        <path d="M 490 310 L 515 400" class="comp-arrow" />
+        <path d="M 520 310 L 645 400" class="comp-arrow" />
+      </svg>
     </div>
   </div>
 </div>
 
-<!-- SLIDE 6 — Deployment Diagram -->
-<div class="slide" id="slide-15">
+<!-- SLIDE 6: DEPLOYMENT DIAGRAM -->
+<div class="slide" id="slide-6">
   <div class="grid-bg"></div>
   <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">06 / 17</span></div>
   <div class="slide-body">
-    <div class="slide-title">Deployment Diagram (UML)</div>
-    <div class="slide-subtitle">Production AWS infrastructure and data flow</div>
-    <div class="mermaid">
-      graph TB
-        subgraph Users["🌐 Users"]
-          Client["Browser"]
-        end
-        subgraph CDN["📡 Edge"]
-          CloudFront["CloudFront CDN"]
-        end
-        subgraph AWS["☁️ AWS"]
-          ALB["AWS ALB"]
-          ECS1["ECS Fargate"]
-          ECS2["ECS Fargate"]
-          ECS3["ECS Fargate"]
-          RDS["RDS PostgreSQL"]
-          PostGIS["PostGIS 3dcityDB"]
-          Redis["ElastiCache Redis"]
-          S3["S3 Bucket"]
-        end
-        subgraph External["🔗 External APIs"]
-          GSolar["Google Solar API"]
-          HubSpot["HubSpot CRM"]
-        end
+    <div class="slide-title">Deployment Diagram</div>
+    <div class="slide-subtitle">Production AWS infrastructure</div>
+    <div class="diagram-container">
+      <svg viewBox="0 0 1200 650" style="max-width:100%;height:100%">
+        <defs>
+          <style>
+            .layer-box { fill: rgba(30,144,255,0.08); stroke: rgba(30,144,255,0.5); stroke-width: 2; stroke-dasharray: 5,5; }
+            .service-box { fill: rgba(30,144,255,0.1); stroke: rgba(30,144,255,0.6); stroke-width: 2; }
+            .service-critical { fill: rgba(0,242,254,0.1); stroke: rgba(0,242,254,0.8); }
+            .text-main { font-family: Inter, sans-serif; font-size: 13px; fill: #FFF; font-weight: 700; }
+            .text-small { font-family: Inter, sans-serif; font-size: 11px; fill: #A8B2C1; }
+            .arrow { stroke: rgba(30,144,255,0.6); stroke-width: 2; fill: none; marker-end: url(#arrowhead2); }
+          </style>
+          <marker id="arrowhead2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+            <polygon points="0 0, 10 3, 0 6" fill="rgba(30,144,255,0.8)" />
+          </marker>
+        </defs>
 
-        Client --> CloudFront
-        CloudFront --> ALB
-        ALB --> ECS1
-        ALB --> ECS2
-        ALB --> ECS3
-        ECS1 --> RDS
-        ECS1 --> PostGIS
-        ECS1 --> Redis
-        ECS1 --> S3
-        ECS1 --> GSolar
-        ECS1 --> HubSpot
+        <!-- CDN Layer -->
+        <rect x="50" y="20" width="150" height="80" rx="4" class="layer-box" />
+        <text x="125" y="45" class="text-main">📡 CDN</text>
+        <rect x="70" y="55" width="110" height="35" rx="3" class="service-box" />
+        <text x="125" y="77" class="text-small">CloudFront</text>
+
+        <!-- AWS Layer -->
+        <rect x="50" y="130" width="1100" height="450" rx="4" class="layer-box" />
+        <text x="70" y="155" class="text-main">☁️ AWS</text>
+
+        <!-- ALB -->
+        <rect x="100" y="180" width="100" height="50" rx="3" class="service-box service-critical" />
+        <text x="150" y="210" class="text-small">AWS ALB</text>
+
+        <!-- ECS Instances -->
+        <rect x="250" y="180" width="90" height="50" rx="3" class="service-box" />
+        <text x="295" y="205" class="text-small">ECS-1</text>
+
+        <rect x="360" y="180" width="90" height="50" rx="3" class="service-box" />
+        <text x="405" y="205" class="text-small">ECS-2</text>
+
+        <rect x="470" y="180" width="90" height="50" rx="3" class="service-box" />
+        <text x="515" y="205" class="text-small">ECS-3</text>
+
+        <!-- Data Layer -->
+        <!-- RDS -->
+        <rect x="100" y="290" width="90" height="50" rx="3" class="service-box service-critical" />
+        <text x="145" y="315" class="text-small">RDS</text>
+        <text x="145" y="328" class="text-small">PostgreSQL</text>
+
+        <!-- PostGIS -->
+        <rect x="210" y="290" width="90" height="50" rx="3" class="service-box service-critical" />
+        <text x="255" y="315" class="text-small">PostGIS</text>
+        <text x="255" y="328" class="text-small">3dcityDB</text>
+
+        <!-- Redis -->
+        <rect x="320" y="290" width="90" height="50" rx="3" class="service-box" />
+        <text x="365" y="315" class="text-small">ElastiCache</text>
+        <text x="365" y="328" class="text-small">Redis</text>
+
+        <!-- S3 -->
+        <rect x="430" y="290" width="90" height="50" rx="3" class="service-box" />
+        <text x="475" y="315" class="text-small">S3</text>
+        <text x="475" y="328" class="text-small">Bucket</text>
+
+        <!-- External APIs -->
+        <rect x="600" y="290" width="100" height="50" rx="3" class="service-box" />
+        <text x="650" y="313" class="text-small">Google Solar</text>
+        <text x="650" y="328" class="text-small">API</text>
+
+        <rect x="730" y="290" width="100" height="50" rx="3" class="service-box" />
+        <text x="780" y="313" class="text-small">HubSpot</text>
+        <text x="780" y="328" class="text-small">CRM</text>
+
+        <!-- Security -->
+        <text x="70" y="400" class="text-main">🔐 Security & Monitoring</text>
+        <text x="100" y="425" class="text-small">• TLS 1.3 encryption (transit)</text>
+        <text x="100" y="445" class="text-small">• AWS KMS encryption (at rest)</text>
+        <text x="100" y="465" class="text-small">• CloudWatch + Datadog monitoring</text>
+        <text x="100" y="485" class="text-small">• Rate limiting: 1000 req/min</text>
+        <text x="100" y="505" class="text-small">• Circuit breaker for API failures</text>
+
+        <!-- Arrows -->
+        <path d="M 125 100 L 150 180" class="arrow" />
+        <path d="M 150 230 L 295 180" class="arrow" />
+        <path d="M 150 230 L 405 180" class="arrow" />
+        <path d="M 150 230 L 515 180" class="arrow" />
+        <path d="M 295 230 L 145 290" class="arrow" />
+        <path d="M 295 230 L 255 290" class="arrow" />
+        <path d="M 295 230 L 365 290" class="arrow" />
+      </svg>
     </div>
   </div>
 </div>
 
-<!-- SLIDE 7 — Sequence Diagram -->
-<div class="slide" id="slide-13">
+<!-- SLIDE 7: SEQUENCE DIAGRAM -->
+<div class="slide" id="slide-7">
   <div class="grid-bg"></div>
   <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">07 / 17</span></div>
   <div class="slide-body">
-    <div class="slide-title">Sequence Diagram (UML)</div>
-    <div class="slide-subtitle">7-step workflow when user searches "Kirchheim"</div>
-    <div class="mermaid">
-      sequenceDiagram
-        participant U as User
-        participant A as API
-        participant G as Geocoder
-        participant D as 3dcityDB
-        participant S as Solar API
-        participant L as LLM
-
-        U->>A: Search "Kirchheim"
-        A->>G: Fuzzy match
-        G-->>A: Bounds + AGS code (500ms)
-        A->>D: Pre-filter buildings
-        D-->>A: Top 5k buildings (800ms)
-        A->>S: Call for top 50
-        S-->>A: Solar results (1-2 min)
-        A->>A: PV Math (100ms)
-        A->>L: Generate narrative
-        L-->>A: Summary text (2-3s)
-        A-->>U: Briefing JSON (2-3 min total)
+    <div class="slide-title">Sequence Diagram</div>
+    <div class="slide-subtitle">7-step workflow: "Kirchheim" → Briefing (2-3 min)</div>
+    <div style="flex:1;overflow:auto">
+      <div class="timeline-item">
+        <div class="time">1️⃣ User Input → Geocoding (500ms)</div>
+        <div class="desc">"Kirchheim" + fuzzy match → AGS code + bbox (cached)</div>
+      </div>
+      <div class="timeline-item">
+        <div class="time">2️⃣ Pre-Filter (800ms)</div>
+        <div class="desc">Query 3dcityDB: 50k buildings → filter roof > 200m² → sort by area</div>
+      </div>
+      <div class="timeline-item">
+        <div class="time">3️⃣ Solar Calculation (1-2 min) ⭐ Slowest</div>
+        <div class="desc">Call Google Solar API for top 50 buildings only. Returns: kWh/year, irradiance</div>
+      </div>
+      <div class="timeline-item">
+        <div class="time">4️⃣ PV Math (100ms)</div>
+        <div class="desc">Deterministic: kWp = area × insolation × efficiency. Payback = capex ÷ savings</div>
+      </div>
+      <div class="timeline-item">
+        <div class="time">5️⃣ CRM Join (200ms)</div>
+        <div class="desc">Fuzzy address match buildings to HubSpot deals. Attach deal status + contacts</div>
+      </div>
+      <div class="timeline-item">
+        <div class="time">6️⃣ LLM Narrative (2-3s)</div>
+        <div class="desc">Generate summary. AI writes TEXT ONLY. All numbers injected from PV math.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="time">7️⃣ Return Briefing JSON (immediate)</div>
+        <div class="desc">Structured output: municipality, solar results, CRM context, recommendation</div>
+      </div>
+      <div class="highlight-box" style="margin-top:16px">
+        <p><strong>Total: 2-3 minutes | Cost: €1.50</strong> (50 API calls × €0.03)</p>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- SLIDE 8 — Data Flow / Workflow -->
-<div class="slide" id="slide-14">
+<!-- SLIDE 8: DATA FLOW DEEP DIVE -->
+<div class="slide" id="slide-8">
   <div class="grid-bg"></div>
   <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">08 / 17</span></div>
   <div class="slide-body">
-    <div class="slide-title">Request Workflow</div>
-    <div class="slide-subtitle">Step-by-step execution when user searches "Gemeinde Kirchheim"</div>
-
+    <div class="slide-title">Request Workflow (Detailed)</div>
+    <div class="slide-subtitle">Timing breakdown for each step</div>
     <div class="timeline-item">
-      <div class="time">Step 1 — Geocoding (500ms, cached)</div>
-      <div class="desc">"Kirchheim" → fuzzy match → AGS code 09175124 + bounding box</div>
+      <div class="time">Geocoding (500ms, cached)</div>
+      <div class="desc">OpenStreetMap fuzzy matcher. First call: 500ms. Cached result: instant (TTL 7 days).</div>
     </div>
-
     <div class="timeline-item">
-      <div class="time">Step 2 — Building Pre-Filter (800ms)</div>
-      <div class="desc">Query 3dcityDB: all buildings in bbox → filter roof area > 200 m² → sort by area</div>
+      <div class="time">Pre-Filter (800ms)</div>
+      <div class="desc">PostGIS spatial query. Fast because filtering by bbox + numeric threshold (no geometry calc).</div>
     </div>
-
     <div class="timeline-item">
-      <div class="time">Step 3 — Solar Calculation (1-2 min, parallelized)</div>
-      <div class="desc">Call Google Solar API for top 50 buildings. Returns: potential kWh/year, irradiance</div>
+      <div class="time">Solar API (1-2 min) — Network I/O dominant</div>
+      <div class="desc">Parallelized calls to Google. 50 buildings × 2 sec per call (rate limited). Mostly waiting.</div>
     </div>
-
     <div class="timeline-item">
-      <div class="time">Step 4 — PV Math (100ms)</div>
-      <div class="desc">Deterministic: kWp = roof_area × insolation × efficiency. Payback = capex ÷ annual_savings</div>
+      <div class="time">PV Math (100ms)</div>
+      <div class="desc">NumPy vectorized calculations. Linear algebra, no loops.</div>
     </div>
-
     <div class="timeline-item">
-      <div class="time">Step 5 — CRM Join (200ms)</div>
-      <div class="desc">Fuzzy address match: link buildings to HubSpot deals. Attach deal status + contact info</div>
+      <div class="time">CRM Join (200ms)</div>
+      <div class="desc">Database lookup + fuzzy string comparison (FuzzyWuzzy).</div>
     </div>
-
     <div class="timeline-item">
-      <div class="time">Step 6 — LLM Narrative (2-3s)</div>
-      <div class="desc">Generate summary: "Kirchheim has X buildings, Y MWp potential, Z CO₂ impact." AI writes text only.</div>
+      <div class="time">LLM Narrative (2-3s)</div>
+      <div class="desc">Claude API call. Token count ~500-1000. Returns structured narrative text.</div>
     </div>
-
-    <div class="timeline-item">
-      <div class="time">Step 7 — Return (immediate)</div>
-      <div class="desc">Structured JSON: municipality data, solar results, CRM context, recommendation</div>
-    </div>
-
     <div class="highlight-box" style="margin-top:12px">
-      <p><strong>Total Latency: 2-3 minutes</strong> (mostly Step 3 Google API calls) | <strong>Cost: €1.50</strong> (50 calls × €0.03)</p>
+      <p><strong>Key insight:</strong> Step 3 dominates. Can't parallelize further without hitting API rate limits. All other steps are highly optimized.</p>
     </div>
   </div>
 </div>
 
-<!-- SLIDE 6 — Design Decision #1 - Municipality Lookup -->
-<div class="slide" id="slide-15">
+<!-- SLIDE 9: DESIGN DECISION #1 -->
+<div class="slide" id="slide-9">
   <div class="grid-bg"></div>
   <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">09 / 17</span></div>
   <div class="slide-body">
     <div class="slide-title">Design Decision #1: Municipality Lookup</div>
     <div class="slide-subtitle">How does "Kirchheim" become a searchable geographic area?</div>
-
     <div class="decision-card">
       <div class="dec-title">❌ Option A: Exact string match in database</div>
       <div class="dec-text">Search 16,000 German municipalities for "Kirchheim". Fast, but fragile. Fails on typos, abbreviations, spacing variations.</div>
     </div>
-
     <div class="decision-card">
       <div class="dec-title">✅ Option B: Geocoding with fuzzy matching + caching</div>
       <div class="dec-text">Call geocoder (OpenStreetMap) with fuzzy matching. Returns municipality bounds + AGS code. Cache result. 1-2s on first query, instant on repeat.</div>
     </div>
-
     <div class="highlight-box">
-      <p><strong>Why Option B wins:</strong> Handles typos and variations. Returns the standardized AGS code, which every system (CRM, 3dcityDB) uses to join data. Caching eliminates latency on second query.</p>
+      <p><strong>Why Option B wins:</strong> Handles typos and variations. Returns standardized AGS code (used everywhere). Caching eliminates latency on second query.</p>
     </div>
   </div>
 </div>
 
-<!-- SLIDE 7 — Design Decision #2 - PV Triggers -->
-<div class="slide" id="slide-13">
+<!-- SLIDE 10: DESIGN DECISION #2 -->
+<div class="slide" id="slide-10">
   <div class="grid-bg"></div>
   <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">10 / 17</span></div>
   <div class="slide-body">
     <div class="slide-title">Design Decision #2: PV Computation Strategy</div>
     <div class="slide-subtitle">How do we avoid calling Google Solar API 50,000 times?</div>
-
     <div class="decision-card">
       <div class="dec-title">❌ Naive Approach: Compute all buildings</div>
       <div class="dec-text">50,000 buildings × €0.03/call = €1,500 per briefing. 50,000 ÷ 100 calls/min = 500 minutes (8+ hours). Unacceptable.</div>
     </div>
-
     <div class="decision-card">
       <div class="dec-title">✅ Smart Approach: Pre-filter → top 50 only</div>
       <div class="dec-text">Filter buildings by roof area (5k qualify). Rank by size. Call Google API only for top 50. Cost: €1.50. Time: 1-2 minutes.</div>
     </div>
-
     <div class="highlight-box">
       <p><strong>The Insight:</strong> A sales engineer cares about the best 10 buildings, not all 50,000. Building geometry is static, so pre-filtering is fast and cheap. Call expensive APIs only for the winners.</p>
     </div>
   </div>
 </div>
 
-<!-- SLIDE 8 — Design Decision #3 - AI Role -->
-<div class="slide" id="slide-14">
+<!-- SLIDE 11: DESIGN DECISION #3 -->
+<div class="slide" id="slide-11">
   <div class="grid-bg"></div>
   <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">11 / 17</span></div>
   <div class="slide-body">
     <div class="slide-title">Design Decision #3: Where AI Fits</div>
     <div class="slide-subtitle">When AI creates value, and when it creates risk</div>
-
     <div class="decision-card">
       <div class="dec-title">✅ AI: Address fuzzy matching</div>
       <div class="dec-text">Match "Rathaus, Kirchheim" against "Town Hall, Kirchheim" in CRM. NLP beats regex.</div>
     </div>
-
     <div class="decision-card">
       <div class="dec-title">✅ AI: Narrative generation</div>
       <div class="dec-text">Generate contextual summary: "Strong irradiance + existing relationship. Open with Rathaus as anchor." LLMs excel at this.</div>
     </div>
-
     <div class="decision-card">
       <div class="dec-title">❌ AI: Financial calculations</div>
       <div class="dec-text">Never. LLMs hallucinate numbers. An invented 500 kWp system destroys credibility.</div>
     </div>
-
     <div class="highlight-box">
       <p><strong>Risk Mitigation:</strong> AI writes only text. All numbers come from deterministic code. Pydantic schemas validate every field.</p>
     </div>
   </div>
 </div>
 
-<!-- SLIDE 9 — Design Decision #4 - CRM Join -->
-<div class="slide" id="slide-15">
+<!-- SLIDE 12: DESIGN DECISION #4 -->
+<div class="slide" id="slide-12">
   <div class="grid-bg"></div>
   <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">12 / 17</span></div>
   <div class="slide-body">
     <div class="slide-title">Design Decision #4: CRM Data Join</div>
     <div class="slide-subtitle">Linking buildings to deals without a common key</div>
-
     <div class="decision-card">
       <div class="dec-title">❌ Exact address match</div>
       <div class="dec-text">"Hauptstraße 12" vs "Hauptstr. 12" vs "Main Street 12" fail to match. Brittle.</div>
     </div>
-
     <div class="decision-card">
       <div class="dec-title">✅ Fuzzy address match + coordinate proximity</div>
-      <div class="dec-text">Use NLP to compare addresses (handles variations + typos). Also compare lat/lon (catches name variations). Store HubSpot deal metadata in result.</div>
+      <div class="dec-text">Use NLP to compare addresses (handles variations, typos). Also compare lat/lon (catches name variations). Store HubSpot deal metadata in result.</div>
     </div>
-
     <div class="highlight-box">
       <p><strong>Output:</strong> Briefing includes deal context: "2 active deals · Last contact: 3 weeks ago · Key contact: Hans Müller"</p>
     </div>
   </div>
 </div>
 
-<!-- SLIDE 10 — Trade-offs: What to Cut -->
+<!-- SLIDE 13: TRADE-OFFS -->
 <div class="slide" id="slide-13">
   <div class="grid-bg"></div>
   <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">13 / 17</span></div>
   <div class="slide-body">
     <div class="slide-title">V1 Trade-offs: What Ships in 2 Weeks</div>
     <div class="slide-subtitle">Shipping means cutting features that don't prove the core idea</div>
-
     <div class="decision-card">
       <div class="dec-title">❌ Cut: Full city pre-computation</div>
       <div class="dec-text">V1: Compute on-demand (2-3 min). V2: Pre-compute solar data at night, serve from cache (instant). V1 proves value faster.</div>
     </div>
-
     <div class="decision-card">
       <div class="dec-title">❌ Cut: Bi-directional CRM sync</div>
       <div class="dec-text">V1: Read-only CRM data. V2: Push solar scores back to HubSpot deals. Read-only is simpler.</div>
     </div>
-
     <div class="decision-card">
       <div class="dec-title">❌ Cut: Multi-step AI agent</div>
       <div class="dec-text">V1: One LLM call, one narrative. V2: Agentic loop with brainstorming. Simple is better.</div>
     </div>
-
     <div class="decision-card">
       <div class="dec-title">✅ Keep: Core insight</div>
       <div class="dec-text">Pre-filter + selective API calls + deterministic math + LLM narrative. If this saves sales engineers 3 hours per municipality, we have product-market fit.</div>
@@ -526,43 +536,13 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
   </div>
 </div>
 
-<!-- SLIDE 15 — Security & Risk -->
-<div class="slide" id="slide-15">
+<!-- SLIDE 14: SUMMARY -->
+<div class="slide" id="slide-14">
   <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">15 / 17</span></div>
-  <div class="slide-body">
-    <div class="slide-title">Security & Risk Mitigation</div>
-    <div class="slide-subtitle">Production-grade safeguards and compliance</div>
-
-    <div class="decision-card">
-      <div class="dec-title">🔐 Authentication & Encryption</div>
-      <div class="dec-text">OAuth2 for HubSpot login. TLS 1.3 encryption in transit. AWS KMS encryption at rest. Rate limiting: 1,000 req/min per user.</div>
-    </div>
-
-    <div class="decision-card">
-      <div class="dec-title">🛡️ AI Safety</div>
-      <div class="dec-text">Pydantic schemas validate every output. AI writes text only. All financial numbers from deterministic code. Circuit breaker for API failures.</div>
-    </div>
-
-    <div class="decision-card">
-      <div class="dec-title">📋 Compliance</div>
-      <div class="dec-text">GDPR: 24-month data retention. Audit logs record every API call. SOC2 ready with CloudWatch + Datadog monitoring.</div>
-    </div>
-
-    <div class="highlight-box">
-      <p><strong>Risk Principle:</strong> Never let AI generate financial numbers. Validation happens at every layer. Auditability is built-in.</p>
-    </div>
-  </div>
-</div>
-
-<!-- SLIDE 16 — Summary -->
-<div class="slide" id="slide-16">
-  <div class="grid-bg"></div>
-  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">16 / 17</span></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">14 / 17</span></div>
   <div class="slide-body" style="align-items:center;justify-content:center;text-align:center">
     <div class="slide-title" style="margin-bottom:16px">The Core Architectural Insight</div>
     <div class="slide-subtitle" style="margin-bottom:32px">Everything flows from one principle</div>
-
     <div style="max-width:800px;background:rgba(30,144,255,0.08);border:1px solid rgba(30,144,255,0.3);border-radius:12px;padding:32px;margin-bottom:32px">
       <p style="font-size:16px;color:var(--light);line-height:1.9;margin-bottom:20px">
         <strong>You cannot compute PV for 50,000 buildings in minutes.</strong><br><br>
@@ -575,12 +555,52 @@ body{font-family:'Inter',sans-serif;background:#060e18;color:var(--white);overfl
       </p>
       <p style="font-size:14px;color:var(--gray)">Result: 2-3 minutes, €1.50 cost, sales-ready briefing</p>
     </div>
-
     <p style="font-size:13px;color:var(--light)">This is the design. Every decision traces back to an assumption or a constraint.</p>
   </div>
 </div>
 
-<!-- SLIDE 17 — Live Demo -->
+<!-- SLIDE 15: SECURITY & RISK -->
+<div class="slide" id="slide-15">
+  <div class="grid-bg"></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">15 / 17</span></div>
+  <div class="slide-body">
+    <div class="slide-title">Security & Risk Mitigation</div>
+    <div class="slide-subtitle">Production-grade safeguards and compliance</div>
+    <div class="decision-card">
+      <div class="dec-title">🔐 Authentication & Encryption</div>
+      <div class="dec-text">OAuth2 for HubSpot login. TLS 1.3 encryption in transit. AWS KMS encryption at rest. Rate limiting: 1,000 req/min per user.</div>
+    </div>
+    <div class="decision-card">
+      <div class="dec-title">🛡️ AI Safety</div>
+      <div class="dec-text">Pydantic schemas validate every output. AI writes text only. All financial numbers from deterministic code. Circuit breaker for API failures.</div>
+    </div>
+    <div class="decision-card">
+      <div class="dec-title">📋 Compliance</div>
+      <div class="dec-text">GDPR: 24-month data retention. Audit logs record every API call. SOC2 ready with CloudWatch + Datadog monitoring.</div>
+    </div>
+    <div class="highlight-box">
+      <p><strong>Risk Principle:</strong> Never let AI generate financial numbers. Validation happens at every layer. Auditability is built-in.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 16: QUESTIONS SLIDE -->
+<div class="slide" id="slide-16">
+  <div class="grid-bg"></div>
+  <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">16 / 17</span></div>
+  <div class="slide-body" style="align-items:center;justify-content:center;text-align:center">
+    <div class="slide-title" style="margin-bottom:40px">Questions?</div>
+    <div style="max-width:700px;font-size:16px;color:var(--light);line-height:2">
+      <p style="margin-bottom:20px">Ask me about:</p>
+      <p>🏗️ The architecture and design trade-offs</p>
+      <p>⚡ Performance optimizations and bottlenecks</p>
+      <p>🎯 Why we made each decision</p>
+      <p>🚀 How we ship in two weeks</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 17: LIVE DEMO -->
 <div class="slide" id="slide-17">
   <div class="grid-bg"></div>
   <div class="slide-header"><span class="brand">System Design</span><span class="slide-num">17 / 17</span></div>
